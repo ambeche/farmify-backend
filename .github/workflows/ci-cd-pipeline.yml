@@ -19,5 +19,7 @@ jobs:
         run: npm install  
       - name: lint
         run: npm run lint
+      - name: test
+        run: npm run test
       - name: build step
         run: npm run tsc && cat build/index.js
