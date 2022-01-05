@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "tsc": "tsc",
+    "postinstall": "npm run tsc",
     "start": "node build/index.js",
     "dev": "ts-node-dev src/index.ts",
     "lint": "eslint --ext .ts .",
@@ -44,5 +45,8 @@
   },
   "prettier": {
     "singleQuote": true
+  },
+  "engines": {
+    "node": "16.x"
   }
 }
