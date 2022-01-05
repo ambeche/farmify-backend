@@ -8,7 +8,7 @@ on:
     branches: [main]
     types: [opened, synchronize]
 jobs:
-  linting_and_testing:
+  deployment-pipeline:
     runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v2
@@ -23,3 +23,11 @@ jobs:
         run: npm run test
       - name: build step
         run: npm run tsc && cat build/index.js
+      - name: deployment to heroku
+        uses: akhileshns/heroku-deploy@v3.12.12 
+        with:
+          heroku_api_key: ${{secrets.HEROKU_API_KEY}}
+          heroku_app_name: "farmify-api"
+          heroku_email: "tamanji.ambe@gmail.com"
+          healthcheck: "https://farmify-api.herokuapp.com/health"
+          checkstring: "ok"
