@@ -24,6 +24,7 @@ jobs:
       - name: build step
         run: npm run tsc && cat build/index.js
       - name: deployment to heroku
+        if: ${{ github.event_name == 'push' }}
         uses: akhileshns/heroku-deploy@v3.12.12 
         with:
           heroku_api_key: ${{secrets.HEROKU_API_KEY}}
