@@ -33,11 +33,10 @@ jobs:
           healthcheck: "https://farmify-api.herokuapp.com/health"
           checkstring: "ok"
           rollbackonhealthcheckfailed: true
-  
   sermatic-versioning-of-releases:
-  if: ${{ github.event_name == 'push' }}
     runs-on: ubuntu-20.04
     steps:
+    if: ${{ github.event_name == 'push' }}
       - uses: actions/checkout@v2
         with:
           fetch-depth: '0'
