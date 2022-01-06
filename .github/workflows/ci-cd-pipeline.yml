@@ -33,17 +33,17 @@ jobs:
           healthcheck: "https://farmify-api.herokuapp.com/health"
           checkstring: "ok"
           rollbackonhealthcheckfailed: true
-  
   sermatic-versioning-of-releases:
-  if: ${{ github.event_name == 'push' }}
+    needs: deployment-pipeline
     runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v2
         with:
           fetch-depth: '0'
       - name: Bump version and push tag
-      uses: anothrNick/github-tag-action@eca2b69f9e2c24be7decccd0f15fdb1ea5906598
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        WITH_V: true
-        DEFAULT_BUMP: patch 
+        if: ${{ github.event_name == 'push' }}
+        uses: anothrNick/github-tag-action@eca2b69f9e2c24be7decccd0f15fdb1ea5906598
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          WITH_V: true
+          DEFAULT_BUMP: patch 
