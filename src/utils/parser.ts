@@ -100,7 +100,7 @@ const getCsvFiles = (fileFromClient?: string): string[] => {
   return filesOnServer;
 };
 
-const parseCsvFiles = (fileFromClient?: string) => {
+const parseCsvFiles = (fileFromClient?: string): Promise<FarmRecord[][]> => {
   const filepaths = fileFromClient
     ? getCsvFiles(fileFromClient)
     : getCsvFiles();
@@ -143,4 +143,5 @@ export default {
   parseCsvFiles,
   parseAndValidateFarmRecord,
   assertNever,
+  parseString,
 };

@@ -8,7 +8,7 @@ app.get('/health', (_req, res) => {
 });
 
 // eslint-disable-next-line @typescript-eslint/no-misused-promises
-app.get('/farm', async(_req, res) => {
+app.get('/farms', async (_req, res) => {
   const records = await parseAndValidate.parseCsvFiles();
   res.json(records);
 });
