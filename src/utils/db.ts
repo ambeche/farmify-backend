@@ -2,15 +2,16 @@ import { Sequelize } from 'sequelize';
 import { DATABASE_URL } from './config';
 import parseAndValidate from './parser';
 
-const connectToDb = async () => {
-  const sequelize = new Sequelize(parseAndValidate.parseString(DATABASE_URL), {
-    dialectOptions: {
-      ssl: {
-        require: true,
-        rejectUnauthorized: false,
-      },
+const sequelize = new Sequelize(parseAndValidate.parseString(DATABASE_URL), {
+  dialectOptions: {
+    ssl: {
+      require: true,
+      rejectUnauthorized: false,
     },
-  });
+  },
+});
+
+const connectToDb = async () => {
   try {
     await sequelize.authenticate();
     console.log('database connected');
@@ -20,7 +21,7 @@ const connectToDb = async () => {
     return process.exit(1);
   }
 
-  return null;
+  return;
 };
 
-export { connectToDb };
+export { connectToDb, sequelize };
