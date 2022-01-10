@@ -1,8 +1,8 @@
 import * as Fs from 'fs';
 import path = require('path');
-import csvParser = require('csv-parser');
 import { FARM_FIELDS } from './constants';
 import { FarmRecord, MetricType } from './../types';
+import csvParser = require('csv-parser');
 
 const assertNever = (arg: never): never => {
   throw new Error(`Unexpected value type: ${JSON.stringify(arg)}`);
@@ -29,7 +29,7 @@ const parseDatetime = (date: unknown): Date | undefined => {
 
 const parseString = (stringValue: unknown): string => {
   if (!stringValue || !isString(stringValue))
-    throw new Error('invalid data type');
+    throw new Error(`invalid data type: ${stringValue}`);
   return stringValue;
 };
 

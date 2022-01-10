@@ -17,7 +17,7 @@ farmRouter
       console.log('data', req.body);
 
       const records: FarmRecord[][] = await parseAndValidate.parseCsvFiles();
-      const addedRecords = await farmService.createFarm(records[1]);
+      const addedRecords = await farmService.createFarm(records[3]);
       res.json(addedRecords);
     } catch (error) {
       if (error instanceof Error) console.log('addFarmError', error);
