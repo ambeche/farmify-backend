@@ -1,18 +1,13 @@
 import express from 'express';
-import parseAndValidate from './utils/parser';
+import farmRouter from './routes/farmRouter';
 
 const app = express();
 
+app.use('/farms', farmRouter);
+
+// health check: verify deployment status
 app.get('/health', (_req, res) => {
   res.send('ok');
 });
-
-// eslint-disable-next-line @typescript-eslint/no-misused-promises
-app.get('/farms', async (_req, res) => {
-  const records = await parseAndValidate.parseCsvFiles();
-  res.json(records);
-});
-
-parseAndValidate.getCsvFiles();
 
 export default app;

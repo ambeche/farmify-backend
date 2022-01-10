@@ -3,13 +3,15 @@ import { sequelize } from '../utils/db';
 import { FarmRecord, MetricType } from '../types';
 
 interface FarmAttributes {
-   farmName: string;
-   id?: number;
+  farmName: string;
+  id?: number;
 }
 
 type FarmInput = Optional<FarmAttributes, 'id'>;
-type FarmRecordAttributes = FarmRecord;
-
+interface FarmRecordAttributes extends FarmRecord {
+  farmFarmName?: string;
+  id?: number
+}
 
 class FarmData
   extends Model<FarmRecordAttributes>
@@ -22,10 +24,13 @@ class FarmData
   public id!: number;
 }
 
-
-
 FarmData.init(
   {
+    id: {
+      type: DataTypes.INTEGER,
+      primaryKey: true,
+      autoIncrement: true
+    },
     farmName: {
       type: new DataTypes.STRING(128),
       allowNull: false,
@@ -39,12 +44,13 @@ FarmData.init(
       allowNull: false,
     },
     metricValue: {
-      type: DataTypes.INTEGER,
+      type: new DataTypes.FLOAT(),
       allowNull: false,
     },
   },
   {
-    tableName: 'farmData',
+    modelName: 'farmData',
+    timestamps: false,
     sequelize,
   }
 );
@@ -56,23 +62,21 @@ class Farm extends Model<FarmAttributes, FarmInput> {
 
 Farm.init(
   {
-    id: {
-      type: DataTypes.INTEGER.UNSIGNED,
-      autoIncrement: true,
-      primaryKey: true,
-    },
     farmName: {
-      type: new DataTypes.STRING(128),
+      type: DataTypes.STRING,
+      primaryKey: true,
+      unique: true,
       allowNull: false,
     },
   },
   {
-    tableName: 'farms',
+    modelName: 'farm',
+    timestamps: false,
     sequelize,
   }
 );
 
-FarmData.removeAttribute('id'); // primary key excluded
+FarmData.removeAttribute('farmFarmData');
 
 // A one-many association set between Farm and FarmData (foreign key in FarmData)
 Farm.hasMany(FarmData);
@@ -80,4 +84,10 @@ FarmData.belongsTo(Farm);
 void Farm.sync();
 void FarmData.sync();
 
-export { Farm as default, FarmData, FarmRecordAttributes, FarmAttributes, FarmInput };
+export {
+  Farm as default,
+  FarmData,
+  FarmRecordAttributes,
+  FarmAttributes,
+  FarmInput,
+};
