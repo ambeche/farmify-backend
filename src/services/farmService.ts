@@ -1,3 +1,5 @@
+import { QueryParameters } from './../types';
+//import sequelize from 'sequelize';
 import Farm, { FarmData } from '../models/Farm';
 import { FarmRecord } from '../types';
 
@@ -14,12 +16,32 @@ const createFarm = async (recordsOfRecords: FarmRecord[]) => {
   return newFarmData;
 };
 
-const getFarms = async () => {
-  const farms = await Farm.findAll({
-    include: {
-      model: FarmData,
-      attributes: { exclude: ['farmFarmName', 'id'] }
+const getFarms = async (query?: QueryParameters) => {
+  const where: QueryParameters = {};
+  const options: QueryParameters = { limit: 20, offset: 0 };
+
+  console.log('farm log', Boolean(query?.metricType));
+
+  // filters applied to endpoint through query parameters
+  // default limit and offset set
+  if (query) {
+    if (query.limit) options.limit = query.limit;
+    if ((query.page && query.limit) || query.offset) {
+      if (query.page && query.limit)
+        options.offset = (query.page -1) * query?.limit;
+      else options.offset = query.offset;
     }
+    if (query.metricType) where.metricType = query.metricType;
+  }
+
+  const farms = await FarmData.findAll({
+    ...options,
+    where,
+    attributes: { exclude: ['farmFarmName'] },
+    include: {
+      model: Farm,
+      attributes: ['farmName'],
+    },
   });
   return farms;
 };

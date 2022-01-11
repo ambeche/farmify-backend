@@ -7,10 +7,17 @@ const farmRouter = express.Router();
 
 farmRouter
   .route('/')
-  .get(async (_req, res) => {
-    //const records = await parseAndValidate.parseCsvFiles();
-    const records = await farmService.getFarms();
-    res.json(records);
+  .get(async (req, res) => {
+    try {
+      console.log('query', req.query);
+      const validatedQueries = parseAndValidate.parseAndValidateQueryParameters(req.query);
+      console.log('query', validatedQueries);
+      const records = await farmService.getFarms(validatedQueries);
+      
+      res.json(records);
+    } catch (error) {
+      if (error instanceof Error) console.log('queryError',error.message);
+    }
   })
   .post(async (req, res) => {
     try {

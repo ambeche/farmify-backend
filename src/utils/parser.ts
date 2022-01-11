@@ -1,7 +1,13 @@
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import * as Fs from 'fs';
 import path = require('path');
 import { FARM_FIELDS } from './constants';
-import { FarmRecord, MetricType } from './../types';
+import {
+  FarmRecord,
+  MetricType,
+  QueryParametersForValidation,
+  QueryParameters,
+} from './../types';
 import csvParser = require('csv-parser');
 
 const assertNever = (arg: never): never => {
@@ -13,9 +19,17 @@ const isString = (arg: unknown): arg is string => {
 };
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-const isMetricEnumType = (metricType: any): metricType is MetricType => {
+const parseMetricType = (metricType: any): MetricType | undefined => {
   // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-  return Object.values(MetricType).includes(metricType);
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-call
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-call
+  const type = metricType?.toLowerCase();
+  if (type === 'rainfall') return 'rainFall' as MetricType.Rainfall;
+  if (type === 'ph') return 'pH' as MetricType.PH;
+  if (type === 'temperature') return 'temperature' as MetricType.Temperature;
+
+  return;
 };
 
 const isDatetime = (date: unknown): date is Date => {
@@ -33,10 +47,11 @@ const parseString = (stringValue: unknown): string => {
   return stringValue;
 };
 
-const parseMetricType = (type: unknown): MetricType => {
-  if (!type || !isMetricEnumType(type))
-    throw new Error(`invalid metric type: ${type}`);
-  return type;
+const parseQueryParamNumber = (numberValue: unknown): number | undefined => {
+  if (!numberValue || !isString(numberValue) || isNaN(Number(numberValue)))
+    return;
+
+  return Number(numberValue);
 };
 
 const parseMetricValue = (value: unknown, type: unknown): number => {
@@ -55,9 +70,27 @@ const parseMetricValue = (value: unknown, type: unknown): number => {
       if (metricValue >= -50 && metricValue <= 100) return metricValue;
       break;
     default:
-      assertNever(metricType);
+      break;
   }
   return metricValue;
+};
+
+const parseAndValidateQueryParameters = ({
+  month: mon,
+  limit: lim,
+  offset: off,
+  metricType: met,
+  page: pg
+}: QueryParametersForValidation): QueryParameters => {
+  const validatedPageNumber = parseQueryParamNumber(pg);
+  const page = validatedPageNumber && validatedPageNumber > 0 ? validatedPageNumber : 1;
+  return {
+    month: parseQueryParamNumber(mon),
+    limit: parseQueryParamNumber(lim),
+    offset: parseQueryParamNumber(off),
+    metricType: parseMetricType(met),
+    page: page,
+  };
 };
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -144,4 +177,5 @@ export default {
   parseAndValidateFarmRecord,
   assertNever,
   parseString,
+  parseAndValidateQueryParameters,
 };
