@@ -77,6 +77,7 @@ const parseMetricValue = (value: unknown, type: unknown): number => {
 
 const parseAndValidateQueryParameters = ({
   month: mon,
+  year:  yr,
   limit: lim,
   offset: off,
   metricType: met,
@@ -86,6 +87,7 @@ const parseAndValidateQueryParameters = ({
   const page = validatedPageNumber && validatedPageNumber > 0 ? validatedPageNumber : 1;
   return {
     month: parseQueryParamNumber(mon),
+    year: parseQueryParamNumber(yr),
     limit: parseQueryParamNumber(lim),
     offset: parseQueryParamNumber(off),
     metricType: parseMetricType(met),

@@ -16,7 +16,7 @@ farmRouter
       
       res.json(records);
     } catch (error) {
-      if (error instanceof Error) console.log('queryError',error.message);
+      if (error instanceof Error) console.log('queryError', error);
     }
   })
   .post(async (req, res) => {

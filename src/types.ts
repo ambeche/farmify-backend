@@ -13,6 +13,7 @@ export interface FarmRecord {
 
 export interface QueryParameters {
   month?: number;
+  year?: number;
   limit?: number;
   offset?: number;
   page?: number;
@@ -21,6 +22,7 @@ export interface QueryParameters {
 
 export type QueryParametersForValidation = {
   month?: unknown;
+  year?: unknown;
   limit?: unknown;
   offset?: unknown;
   metricType?: unknown;

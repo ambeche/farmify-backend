@@ -36,7 +36,7 @@ FarmData.init(
       allowNull: false,
     },
     datetime: {
-      type: DataTypes.DATE,
+      type: DataTypes.DATEONLY,
       allowNull: true,
     },
     metricType: {
