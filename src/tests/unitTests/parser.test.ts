@@ -1,5 +1,6 @@
 import parseAndValidate from '../../utils/parser';
 
+
 describe('Parsing and Validation of farm data', () => {
   test('succeeds with valid values or parameters and returns values transformed to the right type', () => {
     const validFarmRecord = {
@@ -18,7 +19,7 @@ describe('Parsing and Validation of farm data', () => {
     );
     expect(validated?.datetime instanceof Date).toBe(true);
     expect(typeof validFarmRecord.datetime).toBe('string');
-    expect(validated.toString()).toBe(validFarmRecord.toString());
+    expect(validated?.toString()).toBe(validFarmRecord.toString());
   });
 
   describe('fails with an error message and the record is discarded', () => {
@@ -45,7 +46,7 @@ describe('Parsing and Validation of farm data', () => {
         expect(validatedWithInvalidDate).toBeFalsy();
         expect(validatedWithMissingDate).toBeTruthy();
         expect(validatedWithMissingDate?.datetime).toBe(undefined);
-        expect(validatedWithMissingDate.farmName).toBe(withMissingDate.farmName);
+        expect(validatedWithMissingDate?.farmName).toBe(withMissingDate.farmName);
         expect(Boolean(Date.parse(withInvalidDate.datetime))).toBe(false);
       } catch (error) {
         if (error instanceof Error) expect(error.message).toBeTruthy();
