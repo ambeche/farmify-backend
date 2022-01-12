@@ -10,6 +10,10 @@ test('health check is ok; server is running', async () => {
   expect(serverStatus.text).toBe('ok');
 });
 
-afterAll(() => {
-  sequelize.close().catch((error) => console.log(error.message));
+afterAll(async () => {
+  try {
+    await sequelize.connectionManager.close();
+  } catch (error) {
+    if (error instanceof Error) console.log(error.message);
+  }
 });

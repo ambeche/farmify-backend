@@ -20,9 +20,7 @@ const isString = (arg: unknown): arg is string => {
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const parseMetricType = (metricType: any): MetricType | undefined => {
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-call
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+  
   // eslint-disable-next-line @typescript-eslint/no-unsafe-call
   const type = metricType?.toLowerCase();
   if (type === 'rainfall') return 'rainFall' as MetricType.Rainfall;
@@ -77,14 +75,15 @@ const parseMetricValue = (value: unknown, type: unknown): number => {
 
 const parseAndValidateQueryParameters = ({
   month: mon,
-  year:  yr,
+  year: yr,
   limit: lim,
   offset: off,
   metricType: met,
-  page: pg
+  page: pg,
 }: QueryParametersForValidation): QueryParameters => {
   const validatedPageNumber = parseQueryParamNumber(pg);
-  const page = validatedPageNumber && validatedPageNumber > 0 ? validatedPageNumber : 1;
+  const page =
+    validatedPageNumber && validatedPageNumber > 0 ? validatedPageNumber : 1;
   return {
     month: parseQueryParamNumber(mon),
     year: parseQueryParamNumber(yr),
@@ -102,27 +101,32 @@ const parseAndValidateFarmRecord = ({
   metricType: type,
   metricValue: value,
 }: // eslint-disable-next-line @typescript-eslint/no-explicit-any
-any): FarmRecord => {
-  const farmName = parseString(name);
-  const datetime = parseDatetime(date);
-  const metricType = parseMetricType(type);
-  const metricValue = parseMetricValue(value, type);
-  if (
-    !farmName ||
-    !datetime ||
-    !metricType ||
-    metricValue === (null || undefined)
-  ) {
-    throw new Error(
-      `ValidationError: incorrect or malformatted record discarded! {${name} ${date} ${type} ${value}}`
-    );
+any): FarmRecord | undefined => {
+  try {
+    const farmName = parseString(name);
+    const datetime = parseDatetime(date);
+    const metricType = parseMetricType(type);
+    const metricValue = parseMetricValue(value, type);
+    if (
+      !farmName ||
+      !datetime ||
+      !metricType ||
+      metricValue === (null || undefined)
+    ) {
+      throw new Error(
+        `ValidationError: incorrect or malformatted record discarded! {${name} ${date} ${type} ${value}}`
+      );
+    }
+    return {
+      farmName,
+      datetime,
+      metricType,
+      metricValue,
+    };
+  } catch (error) {
+    if (error instanceof Error) console.log(error.message);
   }
-  return {
-    farmName,
-    datetime,
-    metricType,
-    metricValue,
-  };
+  return;
 };
 
 const getCsvFiles = (fileFromClient?: string): string[] => {
@@ -151,7 +155,8 @@ const parseCsvFiles = (fileFromClient?: string): Promise<FarmRecord[][]> => {
           .pipe(csvParser({ headers: FARM_FIELDS, skipLines: 1 }))
           .on('data', (data) => {
             try {
-              singleFarmRecords.push(parseAndValidateFarmRecord(data));
+              const record = parseAndValidateFarmRecord(data);
+              if (record) singleFarmRecords.push();
             } catch (error) {
               if (error instanceof Error)
                 console.log(
