@@ -29,9 +29,3 @@ export type QueryParametersForValidation = {
   page?: unknown;
 };
 
-export type FarmRecordValidationInput = {
-  farmName: unknown;
-  datetime: unknown;
-  metricType: unknown;
-  metricValue: unknown;
-};

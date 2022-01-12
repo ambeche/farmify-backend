@@ -1,8 +1,6 @@
-import { QueryParameters } from './../types';
-import sequelize from 'sequelize';
 import Farm, { FarmData } from '../models/Farm';
 import { FarmRecord } from '../types';
-import { Op } from 'sequelize';
+import { Request } from 'express';
 
 // adds a farm; farm is accociated with it's respective data
 const createFarm = async (recordsOfRecords: FarmRecord[]) => {
@@ -17,49 +15,40 @@ const createFarm = async (recordsOfRecords: FarmRecord[]) => {
   return newFarmData;
 };
 
-const getFarms = async (query?: QueryParameters) => {
-  const where: QueryParameters = {};
-  const options: QueryParameters = { limit: 20, offset: 0 };
-  let datetime = {};
-
-  const filterByDate = (monthorYear: number, label: string) => ({
-    [Op.and]: [
-      sequelize.where(
-        sequelize.fn('date_part', `${label}`, sequelize.col('datetime')),
-        `${monthorYear}`
-      ),
-    ],
+//farms with their associated data nested
+const getFarms = async (filters: Request) => {
+  const farms = await Farm.findAll({
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+    include: {
+      model: FarmData,
+      ...filters.options,
+      attributes: { exclude: ['farmFarmName'] },
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+      where: {
+        ...filters.where,
+        ...filters.datetime,
+      },
+    },
   });
+  return farms;
+};
 
-  //const fromMonth = new Date('2018-12-31T22:00:00.000Z').toDateString();
-  // filters applied to endpoint through query parameters
-  // default limit and offset set
-  if (query) {
-    if (query.limit) options.limit = query.limit;
-    if ((query.page && query.limit) || query.offset) {
-      if (query.page && query.limit)
-        options.offset = (query.page - 1) * query?.limit;
-      else options.offset = query.offset;
-    }
-    if (query.metricType) where.metricType = query.metricType;
-
-    if (query.year) datetime = { ...datetime, ...filterByDate(query.year, 'year') };
-    if (query.month) datetime = { ...datetime, ...filterByDate(query.month, 'month') };
-  }
-
+const getFarmData = async ({options, where, datetime}: Request) => {
+  
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
   const farms = await FarmData.findAll({
     ...options,
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
     where: {
       ...where,
-      ...datetime
+      ...datetime,
     },
     include: {
       model: Farm,
       attributes: ['farmName'],
     },
-    //group: [sequelize.fn('date_trunc', 'month', sequelize.col('farmData.datetime.id'))]
   });
   return farms;
 };
 
-export default { createFarm, getFarms };
+export default { createFarm, getFarms, getFarmData };
