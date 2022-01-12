@@ -1,5 +1,5 @@
+import { FarmRecord } from './../types';
 import Farm, { FarmData } from '../models/Farm';
-import { FarmRecord } from '../types';
 import { Request } from 'express';
 
 // adds a farm; farm is accociated with it's respective data
@@ -16,13 +16,14 @@ const createFarm = async (recordsOfRecords: FarmRecord[]) => {
 };
 
 //farms with their associated data nested
-const getFarms = async (filters: Request) => {
+const getFarms = async (filters: Request): Promise<Farm[]> => {
   const farms = await Farm.findAll({
     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
     include: {
       model: FarmData,
       ...filters.options,
       attributes: { exclude: ['farmFarmName'] },
+      
       // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
       where: {
         ...filters.where,
@@ -33,7 +34,7 @@ const getFarms = async (filters: Request) => {
   return farms;
 };
 
-const getFarmData = async ({options, where, datetime}: Request) => {
+const getFarmData = async ({options, where, datetime}: Request): Promise<FarmRecord[]>=> {
   
   // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
   const farms = await FarmData.findAll({
