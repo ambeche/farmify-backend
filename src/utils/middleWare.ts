@@ -53,7 +53,7 @@ const farmDataFilter = (req: Request, _res: Response, next: NextFunction) => {
   req.datetime = datetime;
   req.where = where;
   console.log('validated queries', validatedQueries);
-  
+
   next();
 };
 

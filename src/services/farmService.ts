@@ -1,7 +1,9 @@
 // all arguments have already been parsed and validated by middleware
 // farmdataFilter and injected into Request object
+
 /* eslint-disable @typescript-eslint/no-unsafe-argument */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
+
 import { FarmRecord } from './../types';
 import Farm, { FarmData } from '../models/Farm';
 import { Request } from 'express';
@@ -31,7 +33,6 @@ const getFarms = async ({
     include: {
       model: FarmData,
       ...options,
-
       where: {
         ...where,
         ...datetime,
@@ -64,7 +65,7 @@ const getFarmStatistics = async ({
   where,
   datetime,
 }: Request): Promise<Farm[]> => {
-  const farms = await FarmData.findAll({
+  const farmStatistics = await FarmData.findAll({
     ...options,
     where: {
       ...where,
@@ -85,7 +86,7 @@ const getFarmStatistics = async ({
     group: ['farmname', 'metricType', 'month', 'farmname'],
   });
 
-  return farms;
+  return farmStatistics;
 };
 
 export default { createFarm, getFarms, getFarmData, getFarmStatistics };

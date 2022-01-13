@@ -35,13 +35,17 @@ farmRouter.get('/data', middleWare.farmDataFilter, async (req, res, next) => {
   }
 });
 
-farmRouter.get('/statistics', middleWare.farmDataFilter, async (req, res, next) => {
-  try {
-    const farmStatistics = await farmService.getFarmStatistics(req);
-    res.json(farmStatistics);
-  } catch (error: unknown) {
-    next(error);
+farmRouter.get(
+  '/statistics',
+  middleWare.farmDataFilter,
+  async (req, res, next) => {
+    try {
+      const farmStatistics = await farmService.getFarmStatistics(req);
+      res.json(farmStatistics);
+    } catch (error: unknown) {
+      next(error);
+    }
   }
-});
+);
 
 export default farmRouter;
