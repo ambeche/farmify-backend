@@ -11,7 +11,6 @@ farmRouter
   .get(middleWare.farmDataFilter, async (req, res) => {
     try {
       const farmsWithRecords = await farmService.getFarms(req);
-
       res.json(farmsWithRecords);
     } catch (error) {
       if (error instanceof Error) console.log('QueriesError', error);
@@ -30,8 +29,16 @@ farmRouter
 farmRouter.get('/data', middleWare.farmDataFilter, async (req, res) => {
   try {
     const farmdata = await farmService.getFarmData(req);
-
     res.json(farmdata);
+  } catch (error) {
+    if (error instanceof Error) console.log('QueriesError', error);
+  }
+});
+
+farmRouter.get('/statistics', middleWare.farmDataFilter, async (req, res) => {
+  try {
+    const farmStatistics = await farmService.getFarmStatistics(req);
+    res.json(farmStatistics);
   } catch (error) {
     if (error instanceof Error) console.log('QueriesError', error);
   }

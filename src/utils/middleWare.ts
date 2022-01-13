@@ -5,53 +5,60 @@ import { Op } from 'sequelize';
 import sequelize from 'sequelize';
 
 const farmDataFilter = (req: Request, _res: Response, next: NextFunction) => {
-  const validatedQueries = parseAndValidate.parseAndValidateQueryParameters(
-    req.query
-  );
-  const where: QueryParameters = {};
-  const options: QueryParameters = { limit: 4, offset: 0 };
-  let datetime = {};
+  try {
+    const validatedQueries = parseAndValidate.parseAndValidateQueryParameters(
+      req.query
+    );
+    const where: QueryParameters = {};
+    const options: QueryParameters = { limit: 100, offset: 0 };
+    let datetime = {};
 
-  const filterByDate = (monthorYear: number, label: string) => ({
-    [Op.and]: [
-      sequelize.where(
-        sequelize.fn('date_part', `${label}`, sequelize.col('datetime')),
-        `${monthorYear}`
-      ),
-    ],
-  });
+    const filterByDate = (monthorYear: number, label: string) => ({
+      [Op.and]: [
+        sequelize.where(
+          sequelize.fn('date_part', `${label}`, sequelize.col('datetime')),
+          `${monthorYear}`
+        ),
+      ],
+    });
 
-  // filters applied to endpoint through validated query parameters
-  // default limit and offset set
-  if (validatedQueries) {
-    if (validatedQueries.limit) options.limit = validatedQueries.limit;
-    if (
-      (validatedQueries.page && validatedQueries.limit) ||
-      validatedQueries.offset
-    ) {
-      if (validatedQueries.page && validatedQueries.limit)
-        options.offset = (validatedQueries.page - 1) * validatedQueries?.limit;
-      else options.offset = validatedQueries.offset;
+    // filters applied to endpoint through validated query
+    // parameters(metric, farm name, month, year, page)
+    // middleware applied to all farm endpoints
+    if (validatedQueries) {
+      if (validatedQueries.limit) options.limit = validatedQueries.limit;
+      if (
+        (validatedQueries.page && validatedQueries.limit) ||
+        validatedQueries.offset
+      ) {
+        if (validatedQueries.page && validatedQueries.limit)
+          options.offset =
+            (validatedQueries.page - 1) * validatedQueries?.limit;
+        else options.offset = validatedQueries.offset;
+      }
+      if (validatedQueries.metricType)
+        where.metricType = validatedQueries.metricType;
+      if (validatedQueries.farmname) where.farmname = validatedQueries.farmname;
+
+      if (validatedQueries.year)
+        datetime = {
+          ...datetime,
+          ...filterByDate(validatedQueries.year, 'year'),
+        };
+      if (validatedQueries.month)
+        datetime = {
+          ...datetime,
+          ...filterByDate(validatedQueries.month, 'month'),
+        };
     }
-    if (validatedQueries.metricType)
-      where.metricType = validatedQueries.metricType;
+    req.options = options;
+    req.datetime = datetime;
+    req.where = where;
 
-    if (validatedQueries.year)
-      datetime = {
-        ...datetime,
-        ...filterByDate(validatedQueries.year, 'year'),
-      };
-    if (validatedQueries.month)
-      datetime = {
-        ...datetime,
-        ...filterByDate(validatedQueries.month, 'month'),
-      };
+    next();
+  } catch (error) {
+    if (error instanceof Error) console.log('error', error.message);
   }
-  req.options = options;
-  req.datetime = datetime;
-  req.where = where;
-
-  next();
 };
 
-export default {farmDataFilter};
+export default { farmDataFilter };

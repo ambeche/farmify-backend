@@ -4,6 +4,6 @@ declare namespace Express {
   export interface Request {
     where?: QueryParameters;
     options?: QueryParameters;
-    datetime?: Record<unknown>;
+    datetime?: Record<sequelize>;
   }
 }

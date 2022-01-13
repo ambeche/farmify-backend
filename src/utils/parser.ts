@@ -20,7 +20,6 @@ const isString = (arg: unknown): arg is string => {
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const parseMetricType = (metricType: any): MetricType | undefined => {
-  
   // eslint-disable-next-line @typescript-eslint/no-unsafe-call
   const type = metricType?.toLowerCase();
   if (type === 'rainfall') return 'rainFall' as MetricType.Rainfall;
@@ -68,7 +67,7 @@ const parseMetricValue = (value: unknown, type: unknown): number => {
       if (metricValue >= -50 && metricValue <= 100) return metricValue;
       break;
     default:
-      break;
+      throw new Error(`unknown metric type: ${metricType}`);
   }
   return metricValue;
 };
@@ -80,53 +79,61 @@ const parseAndValidateQueryParameters = ({
   offset: off,
   metricType: met,
   page: pg,
-}: QueryParametersForValidation): QueryParameters => {
-  const validatedPageNumber = parseQueryParamNumber(pg);
-  const page =
-    validatedPageNumber && validatedPageNumber > 0 ? validatedPageNumber : 1;
-  return {
-    month: parseQueryParamNumber(mon),
-    year: parseQueryParamNumber(yr),
-    limit: parseQueryParamNumber(lim),
-    offset: parseQueryParamNumber(off),
-    metricType: parseMetricType(met),
-    page: page,
-  };
-};
-
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const parseAndValidateFarmRecord = ({
-  farmName: name,
-  datetime: date,
-  metricType: type,
-  metricValue: value,
-}: // eslint-disable-next-line @typescript-eslint/no-explicit-any
-any): FarmRecord | undefined => {
+  farmName,
+}: QueryParametersForValidation): QueryParameters | undefined => {
   try {
-    const farmName = parseString(name);
-    const datetime = parseDatetime(date);
-    const metricType = parseMetricType(type);
-    const metricValue = parseMetricValue(value, type);
-    if (
-      !farmName ||
-      !datetime ||
-      !metricType ||
-      metricValue === (null || undefined)
-    ) {
-      throw new Error(
-        `ValidationError: incorrect or malformatted record discarded! {${name} ${date} ${type} ${value}}`
-      );
-    }
+    const validatedPageNumber = parseQueryParamNumber(pg);
+    const page =
+      validatedPageNumber && validatedPageNumber > 0 ? validatedPageNumber : 1;
+    const month = parseQueryParamNumber(mon);
+    const year = parseQueryParamNumber(yr);
+    const limit = parseQueryParamNumber(lim);
+    const offset = parseQueryParamNumber(off);
+    const metricType = parseMetricType(met);
+    const farmname = parseString(farmName);
     return {
-      farmName,
-      datetime,
+      month,
+      year,
+      limit,
+      offset,
       metricType,
-      metricValue,
+      page: page,
+      farmname,
     };
   } catch (error) {
     if (error instanceof Error) console.log(error.message);
   }
   return;
+};
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const parseAndValidateFarmRecord = ({
+  farmname: name,
+  datetime: date,
+  metricType: type,
+  metricValue: value,
+}: // eslint-disable-next-line @typescript-eslint/no-explicit-any
+any): FarmRecord | undefined => {
+  const farmname = parseString(name);
+  const datetime = parseDatetime(date);
+  const metricType = parseMetricType(type);
+  const metricValue = parseMetricValue(value, type);
+  if (
+    !farmname ||
+    !datetime ||
+    !metricType ||
+    metricValue === (null || undefined)
+  ) {
+    throw new Error(
+      `ValidationError: incorrect or malformatted record discarded! {${name} ${date} ${type} ${value}}`
+    );
+  }
+  return {
+    farmname,
+    datetime,
+    metricType,
+    metricValue,
+  };
 };
 
 const getCsvFiles = (fileFromClient?: string): string[] => {
@@ -156,7 +163,7 @@ const parseCsvFiles = (fileFromClient?: string): Promise<FarmRecord[][]> => {
           .on('data', (data) => {
             try {
               const record = parseAndValidateFarmRecord(data);
-              if (record) singleFarmRecords.push();
+              if (record) singleFarmRecords.push(record);
             } catch (error) {
               if (error instanceof Error)
                 console.log(
