@@ -1,4 +1,3 @@
-
 // all arguments have already been parsed and validated by middleware
 // farmdataFilter and injected into Request object
 /* eslint-disable @typescript-eslint/no-unsafe-argument */
@@ -38,7 +37,6 @@ const getFarms = async ({
         ...datetime,
       },
     },
-    group: ['farmname']
   });
   return farms;
 };
@@ -50,50 +48,41 @@ const getFarmData = async ({
 }: Request): Promise<FarmRecord[]> => {
   const farmData = await FarmData.findAll({
     ...options,
-    attributes: {
-      include: [
-        [
-          sequelize.fn('COUNT', sequelize.col('farmData.metricType')),
-          'totalCount',
-        ],
-      ],
-    },
     where: {
       ...where,
       ...datetime,
     },
+    attributes: { exclude: ['farmFarmname'] },
   });
+  console.log('query', where, options, datetime);
 
   return farmData;
 };
 
-const getFarmStatistics = async ({ options, where, datetime }: Request): Promise<Farm[]> => {
-  console.log(options);
-
+const getFarmStatistics = async ({
+  options,
+  where,
+  datetime,
+}: Request): Promise<Farm[]> => {
   const farms = await FarmData.findAll({
     ...options,
     where: {
       ...where,
-      ...datetime
+      ...datetime,
     },
-    attributes: [ 
-     // [sequelize.where(sequelize.fn(`pH`), sequelize.col('metricType')), 'metricType'],
-      
-      [sequelize.literal(`COUNT(*)`), 'numberofRecords'],
-      [sequelize.fn('date_trunc', 'month', sequelize.col('datetime')), 'month'], 'metricType', 'farmname',
-      [sequelize.fn('min', sequelize.col('farmData.metricValue')),'min',],
-      [
-        sequelize.fn('max', sequelize.col('farmData.metricValue')),
-        'max',
-      ],
-      [
-        sequelize.fn('avg', sequelize.col('farmData.metricValue')),
-        'average',
-      ],
-  ],
-  order: [sequelize.fn('date_trunc', 'month', sequelize.col('datetime'))],
-  group: ['farmname', 'metricType', 'month','farmname'],
+    attributes: [
+      // [sequelize.where(sequelize.fn(`pH`), sequelize.col('metricType')), 'metricType'],
 
+      [sequelize.literal(`COUNT(*)`), 'numberofRecords'],
+      [sequelize.fn('date_trunc', 'month', sequelize.col('datetime')), 'month'],
+      'metricType',
+      'farmname',
+      [sequelize.fn('min', sequelize.col('farmData.metricValue')), 'min'],
+      [sequelize.fn('max', sequelize.col('farmData.metricValue')), 'max'],
+      [sequelize.fn('avg', sequelize.col('farmData.metricValue')), 'average'],
+    ],
+    order: [sequelize.fn('date_trunc', 'month', sequelize.col('datetime'))],
+    group: ['farmname', 'metricType', 'month', 'farmname'],
   });
 
   return farms;

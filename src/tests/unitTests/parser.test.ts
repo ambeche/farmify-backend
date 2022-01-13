@@ -4,7 +4,7 @@ import parseAndValidate from '../../utils/parser';
 describe('Parsing and Validation of farm data', () => {
   test('succeeds with valid values or parameters and returns values transformed to the right type', () => {
     const validFarmRecord = {
-      farmName: "Sari's Potatoes Farm",
+      farmname: "Sari's Potatoes Farm",
       datetime: '2018-12-31T22:00:00.000Z',
       metricType: 'pH',
       metricValue: 6.52,
@@ -24,7 +24,7 @@ describe('Parsing and Validation of farm data', () => {
 
   describe('fails with an error message and the record is discarded', () => {
     const invalidFarmRecord = {
-      farmName: "Sari's Potatoes Farm",
+      farmname: "Sari's Potatoes Farm",
       datetime: '2018-12-31T22:00:00.000Z',
       metricType: 'pH',
       metricValue: 6.52,
@@ -46,7 +46,7 @@ describe('Parsing and Validation of farm data', () => {
         expect(validatedWithInvalidDate).toBeFalsy();
         expect(validatedWithMissingDate).toBeTruthy();
         expect(validatedWithMissingDate?.datetime).toBe(undefined);
-        expect(validatedWithMissingDate?.farmName).toBe(withMissingDate.farmName);
+        expect(validatedWithMissingDate?.farmname).toBe(withMissingDate.farmname);
         expect(Boolean(Date.parse(withInvalidDate.datetime))).toBe(false);
       } catch (error) {
         if (error instanceof Error) expect(error.message).toBeTruthy();

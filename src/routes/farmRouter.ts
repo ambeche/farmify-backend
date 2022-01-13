@@ -8,39 +8,39 @@ const farmRouter = express.Router();
 
 farmRouter
   .route('/')
-  .get(middleWare.farmDataFilter, async (req, res) => {
+  .get(middleWare.farmDataFilter, async (req, res, next) => {
     try {
       const farmsWithRecords = await farmService.getFarms(req);
       res.json(farmsWithRecords);
-    } catch (error) {
-      if (error instanceof Error) console.log('QueriesError', error);
+    } catch (error: unknown) {
+      next(error);
     }
   })
-  .post(async (_req, res) => {
+  .post(async (_req, res, next) => {
     try {
       const records: FarmRecord[][] = await parseAndValidate.parseCsvFiles();
       const addedRecords = await farmService.createFarm(records[3]);
       res.json(addedRecords);
-    } catch (error) {
-      if (error instanceof Error) console.log('addFarmError', error);
+    } catch (error: unknown) {
+      next(error);
     }
   });
 
-farmRouter.get('/data', middleWare.farmDataFilter, async (req, res) => {
+farmRouter.get('/data', middleWare.farmDataFilter, async (req, res, next) => {
   try {
     const farmdata = await farmService.getFarmData(req);
     res.json(farmdata);
   } catch (error) {
-    if (error instanceof Error) console.log('QueriesError', error);
+    next(error);
   }
 });
 
-farmRouter.get('/statistics', middleWare.farmDataFilter, async (req, res) => {
+farmRouter.get('/statistics', middleWare.farmDataFilter, async (req, res, next) => {
   try {
     const farmStatistics = await farmService.getFarmStatistics(req);
     res.json(farmStatistics);
-  } catch (error) {
-    if (error instanceof Error) console.log('QueriesError', error);
+  } catch (error: unknown) {
+    next(error);
   }
 });
 

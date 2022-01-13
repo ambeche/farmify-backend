@@ -79,31 +79,18 @@ const parseAndValidateQueryParameters = ({
   offset: off,
   metricType: met,
   page: pg,
-  farmName,
-}: QueryParametersForValidation): QueryParameters | undefined => {
-  try {
-    const validatedPageNumber = parseQueryParamNumber(pg);
-    const page =
-      validatedPageNumber && validatedPageNumber > 0 ? validatedPageNumber : 1;
-    const month = parseQueryParamNumber(mon);
-    const year = parseQueryParamNumber(yr);
-    const limit = parseQueryParamNumber(lim);
-    const offset = parseQueryParamNumber(off);
-    const metricType = parseMetricType(met);
-    const farmname = parseString(farmName);
-    return {
-      month,
-      year,
-      limit,
-      offset,
-      metricType,
-      page: page,
-      farmname,
-    };
-  } catch (error) {
-    if (error instanceof Error) console.log(error.message);
-  }
-  return;
+}: QueryParametersForValidation): QueryParameters => {
+  const validatedPageNumber = parseQueryParamNumber(pg);
+  const page =
+    validatedPageNumber && validatedPageNumber > 0 ? validatedPageNumber : 1;
+  return {
+    month: parseQueryParamNumber(mon),
+    year: parseQueryParamNumber(yr),
+    limit: parseQueryParamNumber(lim),
+    offset: parseQueryParamNumber(off),
+    metricType: parseMetricType(met),
+    page: page,
+  };
 };
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
