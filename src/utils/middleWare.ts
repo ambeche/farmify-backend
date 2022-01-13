@@ -1,5 +1,5 @@
 import { QueryParameters } from './../types';
-import { NextFunction, Response, Request } from 'express';
+import { NextFunction, Response, Request, ErrorRequestHandler } from 'express';
 import parseAndValidate from '../utils/parser';
 import { Op } from 'sequelize';
 import sequelize from 'sequelize';
@@ -9,7 +9,7 @@ const farmDataFilter = (req: Request, _res: Response, next: NextFunction) => {
     req.query
   );
   const where: QueryParameters = {};
-  const options: QueryParameters = { limit: 4, offset: 0 };
+  const options: QueryParameters = { limit: 100, offset: 0 };
   let datetime = {};
 
   const filterByDate = (monthorYear: number, label: string) => ({
@@ -21,8 +21,9 @@ const farmDataFilter = (req: Request, _res: Response, next: NextFunction) => {
     ],
   });
 
-  // filters applied to endpoint through validated query parameters
-  // default limit and offset set
+  // filters applied to endpoint through validated query
+  // parameters(metric, farm name, month, year, page)
+  // middleware applied to all farm endpoints
   if (validatedQueries) {
     if (validatedQueries.limit) options.limit = validatedQueries.limit;
     if (
@@ -35,6 +36,7 @@ const farmDataFilter = (req: Request, _res: Response, next: NextFunction) => {
     }
     if (validatedQueries.metricType)
       where.metricType = validatedQueries.metricType;
+    if (validatedQueries.farmname) where.farmname = validatedQueries.farmname;
 
     if (validatedQueries.year)
       datetime = {
@@ -50,8 +52,23 @@ const farmDataFilter = (req: Request, _res: Response, next: NextFunction) => {
   req.options = options;
   req.datetime = datetime;
   req.where = where;
+  console.log('validated queries', validatedQueries);
 
   next();
 };
 
-export default {farmDataFilter};
+const validationErrorHandler: ErrorRequestHandler = (
+  error,
+  _req,
+  res,
+  next
+) => {
+  if (error.name === 'ValidationError' && error instanceof Error) {
+    res.status(400).json({ error: error.message });
+    return;
+  }
+  console.error(error);
+  next(error);
+};
+
+export default { farmDataFilter, validationErrorHandler };

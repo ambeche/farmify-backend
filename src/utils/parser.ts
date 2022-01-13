@@ -20,7 +20,6 @@ const isString = (arg: unknown): arg is string => {
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const parseMetricType = (metricType: any): MetricType | undefined => {
-  
   // eslint-disable-next-line @typescript-eslint/no-unsafe-call
   const type = metricType?.toLowerCase();
   if (type === 'rainfall') return 'rainFall' as MetricType.Rainfall;
@@ -68,7 +67,7 @@ const parseMetricValue = (value: unknown, type: unknown): number => {
       if (metricValue >= -50 && metricValue <= 100) return metricValue;
       break;
     default:
-      break;
+      throw new Error(`unknown metric type: ${metricType}`);
   }
   return metricValue;
 };
@@ -96,37 +95,32 @@ const parseAndValidateQueryParameters = ({
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const parseAndValidateFarmRecord = ({
-  farmName: name,
+  farmname: name,
   datetime: date,
   metricType: type,
   metricValue: value,
 }: // eslint-disable-next-line @typescript-eslint/no-explicit-any
 any): FarmRecord | undefined => {
-  try {
-    const farmName = parseString(name);
-    const datetime = parseDatetime(date);
-    const metricType = parseMetricType(type);
-    const metricValue = parseMetricValue(value, type);
-    if (
-      !farmName ||
-      !datetime ||
-      !metricType ||
-      metricValue === (null || undefined)
-    ) {
-      throw new Error(
-        `ValidationError: incorrect or malformatted record discarded! {${name} ${date} ${type} ${value}}`
-      );
-    }
-    return {
-      farmName,
-      datetime,
-      metricType,
-      metricValue,
-    };
-  } catch (error) {
-    if (error instanceof Error) console.log(error.message);
+  const farmname = parseString(name);
+  const datetime = parseDatetime(date);
+  const metricType = parseMetricType(type);
+  const metricValue = parseMetricValue(value, type);
+  if (
+    !farmname ||
+    !datetime ||
+    !metricType ||
+    metricValue === (null || undefined)
+  ) {
+    throw new Error(
+      `ValidationError: incorrect or malformatted record discarded! {${name} ${date} ${type} ${value}}`
+    );
   }
-  return;
+  return {
+    farmname,
+    datetime,
+    metricType,
+    metricValue,
+  };
 };
 
 const getCsvFiles = (fileFromClient?: string): string[] => {
@@ -156,7 +150,7 @@ const parseCsvFiles = (fileFromClient?: string): Promise<FarmRecord[][]> => {
           .on('data', (data) => {
             try {
               const record = parseAndValidateFarmRecord(data);
-              if (record) singleFarmRecords.push();
+              if (record) singleFarmRecords.push(record);
             } catch (error) {
               if (error instanceof Error)
                 console.log(

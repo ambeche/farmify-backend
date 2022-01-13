@@ -1,5 +1,5 @@
 export const FARM_FIELDS = [
-  'farmName',
+  'farmname',
   'datetime',
   'metricType',
   'metricValue',

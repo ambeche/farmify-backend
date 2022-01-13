@@ -3,25 +3,25 @@ import { sequelize } from '../utils/db';
 import { FarmRecord, MetricType } from '../types';
 
 interface FarmAttributes {
-  farmName: string;
+  farmname: string;
   id?: number;
 }
 
 type FarmInput = Optional<FarmAttributes, 'id'>;
 interface FarmRecordAttributes extends FarmRecord {
   farmFarmName?: string;
-  id?: number
+  id?: number;
 }
 
 class FarmData
   extends Model<FarmRecordAttributes>
   implements FarmRecordAttributes
-{
-  public farmName!: string;
-  public datetime?: Date;
-  public metricType!: MetricType;
-  public metricValue!: number;
-  public id!: number;
+{ 
+  declare farmname: string;
+  declare datetime?: Date;
+  declare metricType: MetricType;
+  declare metricValue: number;
+  declare id: number;
 }
 
 FarmData.init(
@@ -29,9 +29,9 @@ FarmData.init(
     id: {
       type: DataTypes.INTEGER,
       primaryKey: true,
-      autoIncrement: true
+      autoIncrement: true,
     },
-    farmName: {
+    farmname: {
       type: new DataTypes.STRING(128),
       allowNull: false,
     },
@@ -56,13 +56,13 @@ FarmData.init(
 );
 
 class Farm extends Model<FarmAttributes, FarmInput> {
-  public farmName!: string;
-  public id!: number;
+  declare farmname: string;
+  declare id: number;
 }
 
 Farm.init(
   {
-    farmName: {
+    farmname: {
       type: DataTypes.STRING,
       primaryKey: true,
       unique: true,
@@ -76,9 +76,7 @@ Farm.init(
   }
 );
 
-FarmData.removeAttribute('farmFarmData');
-
-// A one-many association set between Farm and FarmData (foreign key in FarmData)
+// A one-many association set between Farm and Farmdata (foreign key in FarmData)
 Farm.hasMany(FarmData);
 FarmData.belongsTo(Farm);
 void Farm.sync();
