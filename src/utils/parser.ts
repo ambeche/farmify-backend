@@ -10,6 +10,9 @@ import {
 } from './../types';
 import csvParser = require('csv-parser');
 
+export const ValidationError = new Error('Validation error');
+ValidationError.name = 'ValidationError';
+
 const assertNever = (arg: never): never => {
   throw new Error(`Unexpected value type: ${JSON.stringify(arg)}`);
 };
@@ -140,6 +143,8 @@ const parseCsvFiles = (fileFromClient?: string): Promise<FarmRecord[][]> => {
   ValidationError.name = 'ValidationError';
 
   if (fileFromClient && !(path.extname(fileFromClient) === '.csv')) {
+    ValidationError.message =
+      'invalid file format, only csv text files are allowed!';
     throw ValidationError;
   }
   const filepaths = fileFromClient
@@ -170,11 +175,11 @@ const parseCsvFiles = (fileFromClient?: string): Promise<FarmRecord[][]> => {
           })
           .on('end', () => {
             console.log('parsing done!');
-            if (allFarmsRecords[0].length === 0){
+            if (allFarmsRecords[0].length === 0) {
               ValidationError.message = 'missing or malformated records!';
               reject(ValidationError);
             }
-              
+
             resolve(allFarmsRecords);
           });
         allFarmsRecords.push(singleFarmRecords);

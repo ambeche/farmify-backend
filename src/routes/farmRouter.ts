@@ -21,18 +21,16 @@ farmRouter
     try {
       console.log('file', req.file, req.body);
       if (!req.file?.path)
-        return res
-          .status(400)
-          .json({
-            error:
-              'missing or invalid file format, only csv text file is allowed!',
-          });
+        return res.status(400).json({
+          error:
+            'missing or invalid file format, only csv text file is allowed!',
+        });
 
       const records: FarmRecord[][] = await parseAndValidate.parseCsvFiles(
         req.file.path
       );
       const addedRecords = await farmService.createFarm(records[0]);
-     return  res.json(addedRecords);
+      return res.json(addedRecords);
     } catch (error: unknown) {
       next(error);
     }
@@ -58,6 +56,7 @@ farmRouter.get(
     } catch (error: unknown) {
       next(error);
     }
+    return;
   }
 );
 

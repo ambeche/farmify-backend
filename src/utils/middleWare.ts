@@ -1,7 +1,7 @@
 import { QueryParameters } from './../types';
 import { NextFunction, Response, Request, ErrorRequestHandler } from 'express';
 import parseAndValidate from '../utils/parser';
-import { Op } from 'sequelize';
+import { Op, UniqueConstraintError, ValidationError } from 'sequelize';
 import sequelize from 'sequelize';
 import multer from 'multer';
 
@@ -67,7 +67,16 @@ const validationErrorHandler: ErrorRequestHandler = (
   if (error.name === 'ValidationError' && error instanceof Error) {
     res.status(400).json({ error: error.message });
     return;
+  } else if (
+    error.name === 'SequelizeUniqueConstraintError' &&
+    error instanceof (ValidationError || UniqueConstraintError)
+  ) {
+    res.status(400).json({ error: ` ${error.message}, field must be unique!` });
+    return;
   }
+
+  res.status(404).json({ error: 'resource not found' });
+
   console.error(error);
   next(error);
 };
@@ -85,9 +94,9 @@ const fileFilter = (
   cb: multer.FileFilterCallback
 ) => {
   if (!file.originalname.includes('.csv')) {
-    console.log('filename',file.originalname);
-    
-    return cb( null, false);
+    console.log('filename', file.originalname);
+
+    return cb(null, false);
   }
   cb(null, true);
 };
