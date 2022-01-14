@@ -124,9 +124,9 @@ any): FarmRecord | undefined => {
 };
 
 const getCsvFiles = (fileFromClient?: string): string[] => {
-  if (fileFromClient) return [path.join('./', fileFromClient)];
+  if (fileFromClient) return [fileFromClient];
 
-  const csvDataFolderPath = path.join('./data');
+  const csvDataFolderPath = path.join('./data/initialFarms');
   const filesOnServer = Fs.readdirSync(csvDataFolderPath).map((filename) =>
     path.join(csvDataFolderPath, filename)
   );
@@ -134,12 +134,20 @@ const getCsvFiles = (fileFromClient?: string): string[] => {
 };
 
 const parseCsvFiles = (fileFromClient?: string): Promise<FarmRecord[][]> => {
+  const ValidationError = new Error(
+    'invalid file format, only csv text files are allowed!'
+  );
+  ValidationError.name = 'ValidationError';
+
+  if (fileFromClient && !(path.extname(fileFromClient) === '.csv')) {
+    throw ValidationError;
+  }
   const filepaths = fileFromClient
     ? getCsvFiles(fileFromClient)
     : getCsvFiles();
   console.log('current', getCsvFiles());
 
-  return new Promise((resolve) => {
+  return new Promise((resolve, reject) => {
     try {
       const allFarmsRecords: Array<FarmRecord>[] = [];
       for (const path of filepaths) {
@@ -162,6 +170,11 @@ const parseCsvFiles = (fileFromClient?: string): Promise<FarmRecord[][]> => {
           })
           .on('end', () => {
             console.log('parsing done!');
+            if (allFarmsRecords[0].length === 0){
+              ValidationError.message = 'missing or malformated records!';
+              reject(ValidationError);
+            }
+              
             resolve(allFarmsRecords);
           });
         allFarmsRecords.push(singleFarmRecords);
