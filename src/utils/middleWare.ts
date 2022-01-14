@@ -1,8 +1,9 @@
 import { QueryParameters } from './../types';
 import { NextFunction, Response, Request, ErrorRequestHandler } from 'express';
 import parseAndValidate from '../utils/parser';
-import { Op } from 'sequelize';
+import { Op, UniqueConstraintError, ValidationError } from 'sequelize';
 import sequelize from 'sequelize';
+import multer from 'multer';
 
 const farmDataFilter = (req: Request, _res: Response, next: NextFunction) => {
   const validatedQueries = parseAndValidate.parseAndValidateQueryParameters(
@@ -66,9 +67,42 @@ const validationErrorHandler: ErrorRequestHandler = (
   if (error.name === 'ValidationError' && error instanceof Error) {
     res.status(400).json({ error: error.message });
     return;
+  } else if (
+    error.name === 'SequelizeUniqueConstraintError' &&
+    error instanceof (ValidationError || UniqueConstraintError)
+  ) {
+    res.status(400).json({ error: ` ${error.message}, field must be unique!` });
+    return;
   }
+
+  res.status(404).json({ error: 'resource not found' });
+
   console.error(error);
   next(error);
 };
 
-export default { farmDataFilter, validationErrorHandler };
+const storage = multer.diskStorage({
+  destination: './data/newFarms',
+  filename: (_req, file, cb) => {
+    cb(null, `${Date.now()}-${file.originalname}`);
+  },
+});
+
+const fileFilter = (
+  _req: Request,
+  file: Express.Multer.File,
+  cb: multer.FileFilterCallback
+) => {
+  if (!file.originalname.includes('.csv')) {
+    console.log('filename', file.originalname);
+
+    return cb(null, false);
+  }
+  cb(null, true);
+};
+
+const csvFileUploader = multer({ storage: storage, fileFilter }).single(
+  'farmdata'
+);
+
+export default { farmDataFilter, validationErrorHandler, csvFileUploader };
