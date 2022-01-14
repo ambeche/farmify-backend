@@ -31,6 +31,7 @@ const getFarms = async ({
 }: Request): Promise<Farm[]> => {
   const farms = await Farm.findAll({
     include: {
+      attributes: { exclude: ['farmFarmname'] },
       model: FarmData,
       ...options,
       where: {

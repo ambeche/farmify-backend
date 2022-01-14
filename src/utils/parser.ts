@@ -1,3 +1,5 @@
+import { UserInput } from './../models/User';
+import { UserInputForValidation } from './../types';
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import * as Fs from 'fs';
 import path = require('path');
@@ -190,11 +192,27 @@ const parseCsvFiles = (fileFromClient?: string): Promise<FarmRecord[][]> => {
   });
 };
 
+const parseUserInput = ({
+  username: usr,
+  password: pass,
+}: UserInputForValidation): UserInput | undefined => {
+  try {
+    const username = parseString(usr);
+    const password = parseString(pass);
+
+    return { username, password };
+  } catch (error) {
+    if (error instanceof Error) console.log(error.message);
+  }
+  return;
+};
+
 export default {
   getCsvFiles,
   parseCsvFiles,
   parseAndValidateFarmRecord,
   assertNever,
   parseString,
+  parseUserInput,
   parseAndValidateQueryParameters,
 };

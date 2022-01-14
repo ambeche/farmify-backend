@@ -1,3 +1,4 @@
+import User from './User';
 import { Model, DataTypes, Optional } from 'sequelize';
 import { sequelize } from '../utils/db';
 import { FarmRecord, MetricType } from '../types';
@@ -16,7 +17,7 @@ interface FarmRecordAttributes extends FarmRecord {
 class FarmData
   extends Model<FarmRecordAttributes>
   implements FarmRecordAttributes
-{ 
+{
   declare farmname: string;
   declare datetime?: Date;
   declare metricType: MetricType;
@@ -57,7 +58,8 @@ FarmData.init(
 
 class Farm extends Model<FarmAttributes, FarmInput> {
   declare farmname: string;
-  declare id: number;
+  declare userUsername?: string;
+  declare id?: number;
 }
 
 Farm.init(
@@ -76,11 +78,15 @@ Farm.init(
   }
 );
 
-// A one-many association set between Farm and Farmdata (foreign key in FarmData)
+// A one-many association set between Farm and Farmdata (foreign key in FarmData
+Farm.belongsTo(User);
+User.hasMany(Farm);
 Farm.hasMany(FarmData);
 FarmData.belongsTo(Farm);
+
 void Farm.sync();
 void FarmData.sync();
+void User.sync();
 
 export {
   Farm as default,

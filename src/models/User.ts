@@ -1,12 +1,12 @@
-import { Model, DataTypes } from 'sequelize';
+import { Model, DataTypes, Optional } from 'sequelize';
 import { sequelize } from '../utils/db';
 
 interface UserAttributes {
   username: string;
   passwordHash: string;
-  id?: number;
+  password?: string;
 }
-
+export type UserInput = Optional<UserAttributes, 'passwordHash'>;
 class User extends Model<UserAttributes> implements UserAttributes {
   declare username: string;
   declare passwordHash: string;
@@ -27,6 +27,7 @@ User.init(
     },
   },
   {
+    tableName: 'users',
     modelName: 'user',
     sequelize,
   }

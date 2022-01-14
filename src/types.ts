@@ -30,3 +30,8 @@ export type QueryParametersForValidation = {
   page?: unknown;
   farmName?: unknown;
 };
+
+export type UserInputForValidation = {
+  username: unknown;
+  password: unknown;
+};

@@ -64,21 +64,27 @@ const validationErrorHandler: ErrorRequestHandler = (
   res,
   next
 ) => {
-  if (error.name === 'ValidationError' && error instanceof Error) {
-    res.status(400).json({ error: error.message });
+  try {
+    if (error.name === 'ValidationError' && error instanceof Error) {
+      res.status(400).json({ error: error.message });
+      return;
+    } else if (
+      error.name === 'SequelizeUniqueConstraintError' &&
+      error instanceof (ValidationError || UniqueConstraintError)
+    ) {
+      res
+        .status(400)
+        .json({ error: ` ${error.message}, field must be unique!` });
+      return;
+    }
+
+    res.status(404).json({ error: 'resource not found' });
+    console.error(error);
+    next();
     return;
-  } else if (
-    error.name === 'SequelizeUniqueConstraintError' &&
-    error instanceof (ValidationError || UniqueConstraintError)
-  ) {
-    res.status(400).json({ error: ` ${error.message}, field must be unique!` });
-    return;
+  } catch (error) {
+    if (error instanceof Error) console.log(error.message);
   }
-
-  res.status(404).json({ error: 'resource not found' });
-
-  console.error(error);
-  next(error);
 };
 
 const storage = multer.diskStorage({

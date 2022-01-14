@@ -13,23 +13,9 @@ const sequelize = new Sequelize(parseAndValidate.parseString(DATABASE_URL), {
   },
 });
 
-const connectToDb = async () => {
-  try {
-    await sequelize.authenticate();
-    console.log('database connected');
-  } catch (error) {
-    if (error instanceof Error)
-      console.log('connecting database failed', error.message);
-    return process.exit(1);
-  }
-
-  return;
-};
-
 const initializeDbWithExistingFarmData = async () => {
   try {
     const noDataInDb = await Farm.findAll();
-
     if (noDataInDb.length === 0) {
       const parsedFarmDataOnServer = await parseAndValidate.parseCsvFiles();
 
@@ -41,6 +27,20 @@ const initializeDbWithExistingFarmData = async () => {
   } catch (error) {
     if (error instanceof Error) console.log('Db Initialization failed', error);
   }
+};
+
+const connectToDb = async () => {
+  try {
+    await sequelize.authenticate();
+    console.log('database connected');
+    await initializeDbWithExistingFarmData();
+  } catch (error) {
+    if (error instanceof Error)
+      console.log('connecting database failed', error.message);
+    return process.exit(1);
+  }
+
+  return;
 };
 
 export { connectToDb, sequelize, initializeDbWithExistingFarmData };
