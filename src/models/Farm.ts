@@ -5,13 +5,15 @@ import { FarmRecord, MetricType } from '../types';
 
 interface FarmAttributes {
   farmname: string;
+  userUsername?: string; //pk of farm ouner
   id?: number;
 }
 
 type FarmInput = Optional<FarmAttributes, 'id'>;
 interface FarmRecordAttributes extends FarmRecord {
-  farmFarmName?: string;
+  farmFarmName?: string; // pk of farm
   id?: number;
+  userUsername?: string;
 }
 
 class FarmData

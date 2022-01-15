@@ -10,7 +10,7 @@ const addUser = async ({ username, password: pass }: UserInput) => {
     { returning: ['username', 'createdAt'] }
   );
 
-  return newUser;
+  return {username: newUser.username, createdAt: newUser.createdAt};
 };
 
 const getUser = async (username: string) => await User.findByPk(username);

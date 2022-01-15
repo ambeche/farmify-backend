@@ -17,20 +17,23 @@ farmRouter
     }
   })
 
-  .post(middleWare.csvFileUploader, async (req, res, next) => {
+  .post( middleWare.bearerTokenExtractor, middleWare.csvFileUploader, async (req, res, next) => {
     try {
       console.log('file', req.file, req.body);
+     if(req.decodedToken.username){
       if (!req.file?.path)
-        return res.status(400).json({
-          error:
-            'missing or invalid file format, only csv text file is allowed!',
-        });
+      return res.status(400).json({
+        error:
+          'missing or invalid file format, only csv text file is allowed!',
+      });
 
-      const records: FarmRecord[][] = await parseAndValidate.parseCsvFiles(
-        req.file.path
-      );
-      const addedRecords = await farmService.createFarm(records[0]);
-      return res.json(addedRecords);
+    const records: FarmRecord[][] = await parseAndValidate.parseCsvFiles(
+      req.file.path
+    );
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+    const addedRecords = await farmService.createFarm(records[0], req.decodedToken.username);
+    return res.json(addedRecords);
+     }
     } catch (error: unknown) {
       next(error);
     }

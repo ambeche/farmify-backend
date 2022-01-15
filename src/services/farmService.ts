@@ -10,8 +10,11 @@ import { Request } from 'express';
 import sequelize from 'sequelize';
 
 // adds a farm; farm is accociated with it's respective data
-const createFarm = async (recordsOfRecords: FarmRecord[]) => {
-  const newfarm = await Farm.create({ farmname: recordsOfRecords[0].farmname });
+const createFarm = async (recordsOfRecords: FarmRecord[], owner: string) => {
+  const newfarm = await Farm.create({
+    farmname: recordsOfRecords[0].farmname,
+    userUsername: owner,
+  });
 
   const recordsWithForeignKey = recordsOfRecords.map((record) => ({
     ...record,

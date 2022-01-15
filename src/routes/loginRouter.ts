@@ -25,7 +25,7 @@ loginRouter.post('/', async (req, res, next) => {
         );
         if (user && verifiedPass) {
           const token = jwt.sign(
-            user,
+            { username: user.username, password: user.password },
             parseAndValidate.parseString(TOKEN_SECRET)
           );
           return res.json({ token, username: user.username });

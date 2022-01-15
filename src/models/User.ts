@@ -10,8 +10,7 @@ export type UserInput = UserAttributes;
 class User extends Model<UserAttributes> implements UserAttributes {
   declare username: string;
   declare password: string;
-  id: any;
-  name: any;
+  declare createdAt: string;
 }
 
 User.init(

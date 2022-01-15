@@ -1,9 +1,9 @@
 import { QueryParameters } from './../types';
 import { NextFunction, Response, Request, ErrorRequestHandler } from 'express';
 import parseAndValidate from '../utils/parser';
-import { Op, UniqueConstraintError, ValidationError } from 'sequelize';
+import { Op } from 'sequelize';
 import sequelize from 'sequelize';
-import multer from 'multer';
+import multer, { MulterError } from 'multer';
 import { TOKEN_SECRET } from './config';
 import * as jwt from 'jsonwebtoken';
 
@@ -67,12 +67,16 @@ const validationErrorHandler: ErrorRequestHandler = (
   next
 ) => {
   try {
-    if (error.name === 'ValidationError' && error instanceof Error) {
+    if (
+      error instanceof MulterError ||
+      (error.name === 'ValidationError' && error instanceof Error)
+    ) {
       res.status(400).json({ error: error.message });
       return;
-    } else if (
-      error.name === 'SequelizeUniqueConstraintError' &&
-      error instanceof (ValidationError || UniqueConstraintError)
+    }
+    if (
+      error.name === 'SequelizeUniqueConstraintError' ||
+      error.name === 'SequelizeDatabaseError'
     ) {
       res
         .status(400)
@@ -81,7 +85,7 @@ const validationErrorHandler: ErrorRequestHandler = (
     }
 
     res.status(404).json({ error: 'resource not found' });
-    console.error(error);
+    console.error('nam of err', error);
     next();
     return;
   } catch (error) {
