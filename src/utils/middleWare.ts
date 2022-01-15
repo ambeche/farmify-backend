@@ -4,6 +4,8 @@ import parseAndValidate from '../utils/parser';
 import { Op, UniqueConstraintError, ValidationError } from 'sequelize';
 import sequelize from 'sequelize';
 import multer from 'multer';
+import { TOKEN_SECRET } from './config';
+import * as jwt from 'jsonwebtoken';
 
 const farmDataFilter = (req: Request, _res: Response, next: NextFunction) => {
   const validatedQueries = parseAndValidate.parseAndValidateQueryParameters(
@@ -111,4 +113,31 @@ const csvFileUploader = multer({ storage: storage, fileFilter }).single(
   'farmdata'
 );
 
-export default { farmDataFilter, validationErrorHandler, csvFileUploader };
+// extract token from authorization header
+const bearerTokenExtractor = (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  const auth = req.get('authorization');
+  if (auth && auth.toLowerCase().startsWith('bearer ')) {
+    try {
+      req.decodedToken = jwt.verify(
+        auth.substring(7),
+        parseAndValidate.parseString(TOKEN_SECRET)
+      );
+    } catch {
+      res.status(401).json({ error: 'invalid token!' });
+    }
+  } else {
+    res.status(401).json({ error: 'Missing token!' });
+  }
+  next();
+};
+
+export default {
+  farmDataFilter,
+  validationErrorHandler,
+  csvFileUploader,
+  bearerTokenExtractor,
+};

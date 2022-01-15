@@ -5,5 +5,6 @@ declare namespace Express {
     where?: QueryParameters;
     options?: QueryParameters;
     datetime?: Record<sequelize>;
+    decodedToken: User
   }
 }
