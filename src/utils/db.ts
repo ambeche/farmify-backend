@@ -41,7 +41,7 @@ const connectToDb = async () => {
   try {
     await sequelize.authenticate();
     console.log('database connected');
-    //await initializeDbWithExistingFarmData();
+    await initializeDbWithExistingFarmData();
   } catch (error) {
     if (error instanceof Error)
       console.log('connecting database failed', error.message);
