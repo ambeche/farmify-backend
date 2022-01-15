@@ -1,9 +1,11 @@
 import { QueryParameters } from './../types';
 import { NextFunction, Response, Request, ErrorRequestHandler } from 'express';
 import parseAndValidate from '../utils/parser';
-import { Op, UniqueConstraintError, ValidationError } from 'sequelize';
+import { Op } from 'sequelize';
 import sequelize from 'sequelize';
-import multer from 'multer';
+import multer, { MulterError } from 'multer';
+import { TOKEN_SECRET } from './config';
+import * as jwt from 'jsonwebtoken';
 
 const farmDataFilter = (req: Request, _res: Response, next: NextFunction) => {
   const validatedQueries = parseAndValidate.parseAndValidateQueryParameters(
@@ -64,21 +66,35 @@ const validationErrorHandler: ErrorRequestHandler = (
   res,
   next
 ) => {
-  if (error.name === 'ValidationError' && error instanceof Error) {
-    res.status(400).json({ error: error.message });
+  try {
+    if (
+      error instanceof MulterError ||
+      (error.name === 'ValidationError' && error instanceof Error)
+    ) {
+      res.status(400).json({ error: error.message });
+      return;
+    }
+    if (
+      error.name === 'SequelizeUniqueConstraintError' ||
+      error.name === 'SequelizeDatabaseError'
+    ) {
+      res
+        .status(400)
+        .json({ error: ` ${error.message}, field must be unique!` });
+      return;
+    }
+    if (error.name === 'FarmifyForbiddenError' && error instanceof Error) {
+      res.status(403).json({ error: error.message });
+      return;
+    }
+
+    res.status(404).json({ error: 'resource not found' });
+    console.error('nam of err', error);
+    next();
     return;
-  } else if (
-    error.name === 'SequelizeUniqueConstraintError' &&
-    error instanceof (ValidationError || UniqueConstraintError)
-  ) {
-    res.status(400).json({ error: ` ${error.message}, field must be unique!` });
-    return;
+  } catch (error) {
+    if (error instanceof Error) console.log(error.message);
   }
-
-  res.status(404).json({ error: 'resource not found' });
-
-  console.error(error);
-  next(error);
 };
 
 const storage = multer.diskStorage({
@@ -105,4 +121,31 @@ const csvFileUploader = multer({ storage: storage, fileFilter }).single(
   'farmdata'
 );
 
-export default { farmDataFilter, validationErrorHandler, csvFileUploader };
+// extract token from authorization header
+const bearerTokenExtractor = (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  const auth = req.get('authorization');
+  if (auth && auth.toLowerCase().startsWith('bearer ')) {
+    try {
+      req.decodedToken = jwt.verify(
+        auth.substring(7),
+        parseAndValidate.parseString(TOKEN_SECRET)
+      );
+    } catch {
+      res.status(401).json({ error: 'invalid token!' });
+    }
+  } else {
+    res.status(401).json({ error: 'Missing token!' });
+  }
+  next();
+};
+
+export default {
+  farmDataFilter,
+  validationErrorHandler,
+  csvFileUploader,
+  bearerTokenExtractor,
+};

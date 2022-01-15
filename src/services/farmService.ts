@@ -1,3 +1,4 @@
+import { FarmifyServerError } from './../utils/parser';
 // all arguments have already been parsed and validated by middleware
 // farmdataFilter and injected into Request object
 
@@ -9,18 +10,50 @@ import Farm, { FarmData } from '../models/Farm';
 import { Request } from 'express';
 import sequelize from 'sequelize';
 
-// adds a farm; farm is accociated with it's respective data
-const createFarm = async (recordsOfRecords: FarmRecord[]) => {
-  const newfarm = await Farm.create({ farmname: recordsOfRecords[0].farmname });
-
+const farmDataCreator = async (
+  recordsOfRecords: FarmRecord[],
+  farmFarmname: string
+): Promise<FarmData[]> => {
   const recordsWithForeignKey = recordsOfRecords.map((record) => ({
     ...record,
-    farmFarmname: newfarm.farmname,
+    farmFarmname,
   }));
 
   const newFarmData = await FarmData.bulkCreate(recordsWithForeignKey);
 
   return newFarmData;
+};
+// adds a farm; farm is accociated with it's respective data
+const createFarm = async (recordsOfRecords: FarmRecord[], owner: string) => {
+  const newfarm = await Farm.create({
+    farmname: recordsOfRecords[0].farmname,
+    userUsername: owner,
+  });
+
+  const farmData = await farmDataCreator(recordsOfRecords, newfarm.farmname);
+  return farmData;
+};
+
+const updateFarmWithData = async (
+  recordsOfRecords: FarmRecord[],
+  owner: string
+) => {
+  const farmExistsAndOwnedByUser = await Farm.findOne({
+    where: {
+      userUsername: owner,
+      farmname: recordsOfRecords[0].farmname,
+    },
+  });
+
+  if (farmExistsAndOwnedByUser && farmExistsAndOwnedByUser.farmname)
+    return await farmDataCreator(
+      recordsOfRecords,
+      farmExistsAndOwnedByUser?.farmname
+    );
+  FarmifyServerError.message =
+    "Action forbidden, only a farm's owner can add records to a farm !";
+  FarmifyServerError.name = 'FarmifyForbiddenError';
+  throw FarmifyServerError;
 };
 
 //farms with their associated data nested
@@ -31,6 +64,7 @@ const getFarms = async ({
 }: Request): Promise<Farm[]> => {
   const farms = await Farm.findAll({
     include: {
+      attributes: { exclude: ['farmFarmname'] },
       model: FarmData,
       ...options,
       where: {
@@ -89,4 +123,10 @@ const getFarmStatistics = async ({
   return farmStatistics;
 };
 
-export default { createFarm, getFarms, getFarmData, getFarmStatistics };
+export default {
+  createFarm,
+  getFarms,
+  getFarmData,
+  getFarmStatistics,
+  updateFarmWithData,
+};

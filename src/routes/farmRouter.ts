@@ -3,8 +3,34 @@ import express from 'express';
 import parseAndValidate from '../utils/parser';
 import farmService from '../services/farmService';
 import middleWare from '../utils/middleWare';
+import { NextFunction, Response, Request } from 'express';
 
 const farmRouter = express.Router();
+
+const confirmTokenAndParseFiles = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    console.log('file', req.file, req.body);
+    if (req.decodedToken.username) {
+      if (!req.file?.path)
+        return res.status(400).json({
+          error:
+            'missing or invalid file format, only csv text file is allowed!',
+        });
+
+      const records: FarmRecord[][] = await parseAndValidate.parseCsvFiles(
+        req.file.path
+      );
+
+      return records;
+    }
+  } catch (error: unknown) {
+    return next(error);
+  }
+};
 
 farmRouter
   .route('/')
@@ -17,34 +43,60 @@ farmRouter
     }
   })
 
-  .post(middleWare.csvFileUploader, async (req, res, next) => {
-    try {
-      console.log('file', req.file, req.body);
-      if (!req.file?.path)
-        return res.status(400).json({
-          error:
-            'missing or invalid file format, only csv text file is allowed!',
-        });
+  .post(
+    middleWare.bearerTokenExtractor,
+    middleWare.csvFileUploader,
+    async (req, res, next) => {
+      try {
+        console.log('file', req.file, req.body);
+        const records = (await confirmTokenAndParseFiles(
+          req,
+          res,
+          next
+        )) as FarmRecord[][];
+        const addedRecords = await farmService.createFarm(
+          records[0],
+          parseAndValidate.parseString(req.decodedToken.username)
+        );
+        return res.json(addedRecords);
+      } catch (error: unknown) {
+        next(error);
+      }
+      return;
+    }
+  );
 
-      const records: FarmRecord[][] = await parseAndValidate.parseCsvFiles(
-        req.file.path
-      );
-      const addedRecords = await farmService.createFarm(records[0]);
-      return res.json(addedRecords);
-    } catch (error: unknown) {
+farmRouter
+  .route('/data')
+  .get(middleWare.farmDataFilter, async (req, res, next) => {
+    try {
+      const farmdata = await farmService.getFarmData(req);
+      res.json(farmdata);
+    } catch (error) {
       next(error);
     }
-    return;
-  });
+  })
+  .post(
+    middleWare.bearerTokenExtractor,
+    middleWare.csvFileUploader,
+    async (req, res, next) => {
+      try {
+        const recordsForFarmUpdate = (await confirmTokenAndParseFiles(
+          req,
+          res,
+          next
+        )) as FarmRecord[][];
 
-farmRouter.get('/data', middleWare.farmDataFilter, async (req, res, next) => {
-  try {
-    const farmdata = await farmService.getFarmData(req);
-    res.json(farmdata);
-  } catch (error) {
-    next(error);
-  }
-});
+        const farmdata = await farmService.updateFarmWithData(
+          recordsForFarmUpdate[0],
+          parseAndValidate.parseString(req.decodedToken.username)
+        );
+        res.json(farmdata);
+      } catch (error) {
+        next(error);
+      }
+    }
+  );
 
 farmRouter.get(
   '/statistics',
