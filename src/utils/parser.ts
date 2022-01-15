@@ -1,6 +1,5 @@
 import { UserInput } from './../models/User';
 import { UserInputForValidation } from './../types';
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import * as Fs from 'fs';
 import path = require('path');
 import { FARM_FIELDS } from './constants';
@@ -15,6 +14,9 @@ import csvParser = require('csv-parser');
 export const ValidationError = new Error('Validation error');
 ValidationError.name = 'ValidationError';
 
+export const FarmifyServerError = new Error();
+FarmifyServerError.name = 'FarmifyServerError';
+
 const assertNever = (arg: never): never => {
   throw new Error(`Unexpected value type: ${JSON.stringify(arg)}`);
 };
@@ -25,6 +27,7 @@ const isString = (arg: unknown): arg is string => {
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const parseMetricType = (metricType: any): MetricType | undefined => {
+  /* eslint-disable @typescript-eslint/no-unsafe-assignment */
   // eslint-disable-next-line @typescript-eslint/no-unsafe-call
   const type = metricType?.toLowerCase();
   if (type === 'rainfall') return 'rainFall' as MetricType.Rainfall;

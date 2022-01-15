@@ -83,6 +83,10 @@ const validationErrorHandler: ErrorRequestHandler = (
         .json({ error: ` ${error.message}, field must be unique!` });
       return;
     }
+    if (error.name === 'FarmifyForbiddenError' && error instanceof Error) {
+      res.status(403).json({ error: error.message });
+      return;
+    }
 
     res.status(404).json({ error: 'resource not found' });
     console.error('nam of err', error);
