@@ -68,6 +68,10 @@ const connectToDb = async () => {
   try {
     await sequelize.authenticate();
     console.log('database connected');
+    //Note: in development mode, runDbMigration terminates the app
+    // if the tables have been created in earlier run (npm run dev)
+    // so for a second run comment out runDbMigration
+    // this is a temporal fix
     await runDbMigrations();
     await initializeDbWithExistingFarmData();
   } catch (error) {
