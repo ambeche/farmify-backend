@@ -6,7 +6,7 @@
   "scripts": {
     "tsc": "cross-env NODE_ENV=production tsc",
     "copyCSVFilesToBuild": "copyfiles -f ./data/initialFarms/*.csv ./build/data/initialFarms && copyfiles -f ./data/newFarms/*.csv ./build/data/newFarms",
-    "postinstall": "npm run tsc && npm run copyCSVFilesToBuild",
+    "postinstall": "rm -rf build && npm run tsc && npm run copyCSVFilesToBuild",
     "start": "cross-env NODE_ENV=production node build/src/index.js",
     "dev": "cross-env NODE_ENV=development ts-node-dev --files src/index.ts",
     "lint": "eslint --ext .ts .",
