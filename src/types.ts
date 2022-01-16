@@ -7,8 +7,8 @@ export enum MetricType {
 export interface FarmRecord {
   farmname: string;
   datetime?: Date;
-  metricType: MetricType;
-  metricValue: number;
+  metrictype: MetricType;
+  value: number;
 }
 
 export interface QueryParameters {
@@ -17,7 +17,7 @@ export interface QueryParameters {
   limit?: number;
   offset?: number;
   page?: number;
-  metricType?: MetricType;
+  metrictype?: MetricType;
   farmname?: string;
 }
 
@@ -26,7 +26,7 @@ export type QueryParametersForValidation = {
   year?: unknown;
   limit?: unknown;
   offset?: unknown;
-  metricType?: unknown;
+  metrictype?: unknown;
   page?: unknown;
   farmName?: unknown;
 };

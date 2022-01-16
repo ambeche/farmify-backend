@@ -85,7 +85,7 @@ const parseAndValidateQueryParameters = ({
   year: yr,
   limit: lim,
   offset: off,
-  metricType: met,
+  metrictype: met,
   page: pg,
 }: QueryParametersForValidation): QueryParameters => {
   const validatedPageNumber = parseQueryParamNumber(pg);
@@ -96,7 +96,7 @@ const parseAndValidateQueryParameters = ({
     year: parseQueryParamNumber(yr),
     limit: parseQueryParamNumber(lim),
     offset: parseQueryParamNumber(off),
-    metricType: parseMetricType(met),
+    metrictype: parseMetricType(met),
     page: page,
   };
 };
@@ -105,20 +105,15 @@ const parseAndValidateQueryParameters = ({
 const parseAndValidateFarmRecord = ({
   farmname: name,
   datetime: date,
-  metricType: type,
-  metricValue: value,
+  metrictype: type,
+  value: mvalue,
 }: // eslint-disable-next-line @typescript-eslint/no-explicit-any
 any): FarmRecord | undefined => {
   const farmname = parseString(name);
   const datetime = parseDatetime(date);
-  const metricType = parseMetricType(type);
-  const metricValue = parseMetricValue(value, type);
-  if (
-    !farmname ||
-    !datetime ||
-    !metricType ||
-    metricValue === (null || undefined)
-  ) {
+  const metrictype = parseMetricType(type);
+  const value = parseMetricValue(mvalue, type);
+  if (!farmname || !datetime || !metrictype || value === (null || undefined)) {
     throw new Error(
       `ValidationError: incorrect or malformatted record discarded! {${name} ${date} ${type} ${value}}`
     );
@@ -126,8 +121,8 @@ any): FarmRecord | undefined => {
   return {
     farmname,
     datetime,
-    metricType,
-    metricValue,
+    metrictype,
+    value,
   };
 };
 
@@ -135,9 +130,11 @@ const getCsvFiles = (fileFromClient?: string): string[] => {
   if (fileFromClient) return [fileFromClient];
 
   const csvDataFolderPath = path.join('./data/initialFarms');
+  console.log('current1 ', csvDataFolderPath);
   const filesOnServer = Fs.readdirSync(csvDataFolderPath).map((filename) =>
     path.join(csvDataFolderPath, filename)
   );
+  console.log('current 2', csvDataFolderPath);
   return filesOnServer;
 };
 
@@ -155,7 +152,7 @@ const parseCsvFiles = (fileFromClient?: string): Promise<FarmRecord[][]> => {
   const filepaths = fileFromClient
     ? getCsvFiles(fileFromClient)
     : getCsvFiles();
-  console.log('current', getCsvFiles());
+  //console.log('current', getCsvFiles());
 
   return new Promise((resolve, reject) => {
     try {

@@ -28,9 +28,10 @@ User.init(
     },
   },
   {
-    tableName: 'users',
     modelName: 'user',
     sequelize,
+    underscored: true,
+    timestamps: false,
   }
 );
 
