@@ -1,10 +1,12 @@
 import express from 'express';
+import cors from 'cors';
 import farmRouter from './routes/farmRouter';
 import loginRouter from './routes/loginRouter';
 import userRouter from './routes/userRouter';
 import middleWare from './utils/middleWare';
 
 const app = express();
+app.use(cors());
 app.use(express.json());
 
 app.use('/farms', farmRouter);
