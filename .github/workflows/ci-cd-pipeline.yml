@@ -22,7 +22,7 @@ jobs:
       - name: test
         run: npm run test
       - name: build step
-        run: npm run tsc && cat build/index.js
+        run: npm run tsc && cat build/src/index.js
       - name: deployment to heroku
         if: ${{ github.event_name == 'push' }}
         uses: akhileshns/heroku-deploy@v3.12.12 

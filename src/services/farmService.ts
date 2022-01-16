@@ -1,10 +1,10 @@
-import { FarmifyServerError } from './../utils/parser';
 // all arguments have already been parsed and validated by middleware
 // farmdataFilter and injected into Request object
 
 /* eslint-disable @typescript-eslint/no-unsafe-argument */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 
+import { FarmifyServerError } from './../utils/parser';
 import { FarmRecord } from './../types';
 import Farm, { FarmData } from '../models/Farm';
 import { Request } from 'express';
@@ -12,11 +12,11 @@ import sequelize from 'sequelize';
 
 const farmDataCreator = async (
   recordsOfRecords: FarmRecord[],
-  farmFarmname: string
+  farm_farmname: string
 ): Promise<FarmData[]> => {
   const recordsWithForeignKey = recordsOfRecords.map((record) => ({
     ...record,
-    farmFarmname,
+    farm_farmname,
   }));
 
   const newFarmData = await FarmData.bulkCreate(recordsWithForeignKey);
@@ -27,7 +27,7 @@ const farmDataCreator = async (
 const createFarm = async (recordsOfRecords: FarmRecord[], owner: string) => {
   const newfarm = await Farm.create({
     farmname: recordsOfRecords[0].farmname,
-    userUsername: owner,
+    user_username: owner,
   });
 
   const farmData = await farmDataCreator(recordsOfRecords, newfarm.farmname);
@@ -40,7 +40,7 @@ const updateFarmWithData = async (
 ) => {
   const farmExistsAndOwnedByUser = await Farm.findOne({
     where: {
-      userUsername: owner,
+      user_username: owner,
       farmname: recordsOfRecords[0].farmname,
     },
   });
@@ -63,8 +63,9 @@ const getFarms = async ({
   datetime,
 }: Request): Promise<Farm[]> => {
   const farms = await Farm.findAll({
+    attributes:  ['farmname', ['user_username', 'owner']],
     include: {
-      attributes: { exclude: ['farmFarmname'] },
+      attributes: { exclude: ['farm_farmname', 'farmFarmname'] },
       model: FarmData,
       ...options,
       where: {
@@ -87,7 +88,7 @@ const getFarmData = async ({
       ...where,
       ...datetime,
     },
-    attributes: { exclude: ['farmFarmname'] },
+    attributes: { exclude: ['farm_farmname'] },
   });
   console.log('query', where, options, datetime);
 
@@ -98,7 +99,7 @@ const getFarmStatistics = async ({
   options,
   where,
   datetime,
-}: Request): Promise<Farm[]> => {
+}: Request): Promise<FarmData[]> => {
   const farmStatistics = await FarmData.findAll({
     ...options,
     where: {
@@ -106,18 +107,16 @@ const getFarmStatistics = async ({
       ...datetime,
     },
     attributes: [
-      // [sequelize.where(sequelize.fn(`pH`), sequelize.col('metricType')), 'metricType'],
-
       [sequelize.literal(`COUNT(*)`), 'numberofRecords'],
       [sequelize.fn('date_trunc', 'month', sequelize.col('datetime')), 'month'],
-      'metricType',
+      'metrictype',
       'farmname',
-      [sequelize.fn('min', sequelize.col('farmData.metricValue')), 'min'],
-      [sequelize.fn('max', sequelize.col('farmData.metricValue')), 'max'],
-      [sequelize.fn('avg', sequelize.col('farmData.metricValue')), 'average'],
+      [sequelize.fn('min', sequelize.col('farmdata.value')), 'min'],
+      [sequelize.fn('max', sequelize.col('farmdata.value')), 'max'],
+      [sequelize.fn('avg', sequelize.col('farmdata.value')), 'average'],
     ],
     order: [sequelize.fn('date_trunc', 'month', sequelize.col('datetime'))],
-    group: ['farmname', 'metricType', 'month', 'farmname'],
+    group: ['farmname', 'metrictype', 'month'],
   });
 
   return farmStatistics;

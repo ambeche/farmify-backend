@@ -1,19 +1,19 @@
-import User from './User';
 import { Model, DataTypes, Optional } from 'sequelize';
 import { sequelize } from '../utils/db';
 import { FarmRecord, MetricType } from '../types';
+import User from './User';
 
 interface FarmAttributes {
   farmname: string;
-  userUsername?: string; //pk of farm ouner
+  user_username?: string; //pk of farm owner
   id?: number;
 }
 
 type FarmInput = Optional<FarmAttributes, 'id'>;
 interface FarmRecordAttributes extends FarmRecord {
-  farmFarmName?: string; // pk of farm
+  farm_farmname?: string; // pk of farm
   id?: number;
-  userUsername?: string;
+  user_sername?: string;
 }
 
 class FarmData
@@ -22,8 +22,8 @@ class FarmData
 {
   declare farmname: string;
   declare datetime?: Date;
-  declare metricType: MetricType;
-  declare metricValue: number;
+  declare metrictype: MetricType;
+  declare value: number;
   declare id: number;
 }
 
@@ -35,32 +35,39 @@ FarmData.init(
       autoIncrement: true,
     },
     farmname: {
-      type: new DataTypes.STRING(128),
+      type: new DataTypes.STRING(),
       allowNull: false,
     },
     datetime: {
       type: DataTypes.DATEONLY,
       allowNull: true,
     },
-    metricType: {
+    metrictype: {
       type: DataTypes.ENUM('pH', 'rainFall', 'temperature'),
       allowNull: false,
     },
-    metricValue: {
+    value: {
       type: new DataTypes.FLOAT(),
       allowNull: false,
     },
+    farm_farmname: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      references: { model: 'farms', key: 'farmname' },
+    },
   },
   {
-    modelName: 'farmData',
+    modelName: 'farmdata',
+    tableName: 'farmdata',
     timestamps: false,
     sequelize,
+    underscored: true,
   }
 );
 
 class Farm extends Model<FarmAttributes, FarmInput> {
   declare farmname: string;
-  declare userUsername?: string;
+  declare user_username?: string;
   declare id?: number;
 }
 
@@ -72,27 +79,30 @@ Farm.init(
       unique: true,
       allowNull: false,
     },
+    user_username: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      references: { model: 'users', key: 'username' },
+    },
   },
   {
     modelName: 'farm',
     timestamps: false,
     sequelize,
+    underscored: true,
   }
 );
 
 // A one-many association set between Farm and Farmdata (foreign key in FarmData
 Farm.belongsTo(User);
 User.hasMany(Farm);
-Farm.hasMany(FarmData);
 FarmData.belongsTo(Farm);
-
-void Farm.sync();
-void FarmData.sync();
-void User.sync();
+Farm.hasMany(FarmData);
 
 export {
   Farm as default,
   FarmData,
+  User,
   FarmRecordAttributes,
   FarmAttributes,
   FarmInput,

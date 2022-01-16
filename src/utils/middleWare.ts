@@ -12,7 +12,7 @@ const farmDataFilter = (req: Request, _res: Response, next: NextFunction) => {
     req.query
   );
   const where: QueryParameters = {};
-  const options: QueryParameters = { limit: 100, offset: 0 };
+  const options: QueryParameters = { limit: 15, offset: 0 };
   let datetime = {};
 
   const filterByDate = (monthorYear: number, label: string) => ({
@@ -37,8 +37,8 @@ const farmDataFilter = (req: Request, _res: Response, next: NextFunction) => {
         options.offset = (validatedQueries.page - 1) * validatedQueries?.limit;
       else options.offset = validatedQueries.offset;
     }
-    if (validatedQueries.metricType)
-      where.metricType = validatedQueries.metricType;
+    if (validatedQueries.metrictype)
+      where.metrictype = validatedQueries.metrictype;
     if (validatedQueries.farmname) where.farmname = validatedQueries.farmname;
 
     if (validatedQueries.year)
@@ -76,11 +76,14 @@ const validationErrorHandler: ErrorRequestHandler = (
     }
     if (
       error.name === 'SequelizeUniqueConstraintError' ||
-      error.name === 'SequelizeDatabaseError'
+      (error.name === 'SequelizeDatabaseError' &&
+        error.message === 'SequelizeDatabaseError')
     ) {
       res
         .status(400)
         .json({ error: ` ${error.message}, field must be unique!` });
+      console.log('sq error', error);
+
       return;
     }
     if (error.name === 'FarmifyForbiddenError' && error instanceof Error) {

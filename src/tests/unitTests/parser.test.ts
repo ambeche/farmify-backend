@@ -1,13 +1,12 @@
 import parseAndValidate from '../../utils/parser';
 
-
 describe('Parsing and Validation of farm data', () => {
   test('succeeds with valid values or parameters and returns values transformed to the right type', () => {
     const validFarmRecord = {
       farmname: "Sari's Potatoes Farm",
       datetime: '2018-12-31T22:00:00.000Z',
-      metricType: 'pH',
-      metricValue: 6.52,
+      metrictype: 'pH',
+      value: 6.52,
     };
 
     const validated =
@@ -26,8 +25,8 @@ describe('Parsing and Validation of farm data', () => {
     const invalidFarmRecord = {
       farmname: "Sari's Potatoes Farm",
       datetime: '2018-12-31T22:00:00.000Z',
-      metricType: 'pH',
-      metricValue: 6.52,
+      metrictype: 'pH',
+      metricvalue: 6.52,
     };
 
     test('if datetime is invalid, but missing date is okay', () => {
@@ -46,7 +45,9 @@ describe('Parsing and Validation of farm data', () => {
         expect(validatedWithInvalidDate).toBeFalsy();
         expect(validatedWithMissingDate).toBeTruthy();
         expect(validatedWithMissingDate?.datetime).toBe(undefined);
-        expect(validatedWithMissingDate?.farmname).toBe(withMissingDate.farmname);
+        expect(validatedWithMissingDate?.farmname).toBe(
+          withMissingDate.farmname
+        );
         expect(Boolean(Date.parse(withInvalidDate.datetime))).toBe(false);
       } catch (error) {
         if (error instanceof Error) expect(error.message).toBeTruthy();
@@ -57,7 +58,7 @@ describe('Parsing and Validation of farm data', () => {
       try {
         const withInvalidMetricType = {
           ...invalidFarmRecord,
-          metricType: 'sunshine',
+          metrictype: 'sunshine',
         };
 
         const validatedWithInvalidMetricType =
@@ -76,22 +77,22 @@ describe('Parsing and Validation of farm data', () => {
         // valid temperature (-50 - 100)
         const withMissingMetricValue = {
           ...invalidFarmRecord,
-          metricValue: undefined,
+          value: undefined,
         };
         const withInvalidPHValue = {
           ...invalidFarmRecord,
-          metricValue: -1,
-          metricType: 'pH',
+          value: -1,
+          metrictype: 'pH',
         };
         const withInvalidRainFallValue = {
           ...invalidFarmRecord,
-          metricValue: -10.99,
-          metricType: 'rainFall',
+          value: -10.99,
+          metrictype: 'rainFall',
         };
         const withInvalidTemperatureValue = {
           ...invalidFarmRecord,
-          metricValue: 1000,
-          metricType: 'temperature',
+          value: 1000,
+          metrictype: 'temperature',
         };
 
         const validatedWithMissingMetricValue =
