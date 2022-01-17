@@ -12,7 +12,7 @@ const farmDataFilter = (req: Request, _res: Response, next: NextFunction) => {
     req.query
   );
   const where: QueryParameters = {};
-  const options: QueryParameters = { limit: 15, offset: 0 };
+  const options: QueryParameters = { limit: 25, offset: 0 };
   let datetime = {};
 
   const filterByDate = (monthorYear: number, label: string) => ({
