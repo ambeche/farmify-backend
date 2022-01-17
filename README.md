@@ -2,7 +2,7 @@
 
 A smart farm application. All your farm data from different sensors and metrics are powered, organised and analysed for you. This backend provides REST APIs for the data and the statistical anlaysis, while the frontend allows the Farmer to monitor the data.
 
-# [Live Demo](https://farmify-api.herokuapp.com/farms)   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;      [ Link to the Frontend Repo]()
+# [Live Demo](https://farmify-api.herokuapp.com/farms)   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;      [ Link to the Frontend Repo](https://github.com/ambeche/farmify)
 
 # [APIs and Usage](#examples)
 ### ```base url = https://farmify-api.herokuapp.com```
@@ -28,12 +28,12 @@ Data filtering is offered through query string parameters. The data from all end
 | page |    `number [>0]`  |   used for pagination, check examples in the options section below |   `1,2,3,....1000`         |  
 | offset |    `number [>=0]`  |  skips a number of items specified by the offset and returns the request items after the skip |  |  
 
-Examples for optoins are provided in the subsections [below](#get-/farms-id)
+Examples for optoins are provided in the subsections below
 
 
 # Usage Examples
 
-## GET &nbsp;&nbsp;&nbsp;```/farms ```(#get-/farms-id)
+## GET &nbsp;&nbsp;&nbsp;```/farms ```
 
 The returned data can be quite large, hence the need for setting a limit as a query parameter.
 
