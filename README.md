@@ -28,12 +28,12 @@ Data filtering is offered through query string parameters. The data from all end
 | page |    `number [>0]`  |   used for pagination, check examples in the options section below |   `1,2,3,....1000`         |  
 | offset |    `number [>=0]`  |  skips a number of items specified by the offset and returns the request items after the skip |  |  
 
-Examples for optoins are provided in the subsections [below](#get-farms-id)
+Examples for optoins are provided in the subsections [below](#get-/farms-id)
 
 
 # Usage Examples
 
-## GET &nbsp;&nbsp;&nbsp;```/farms```
+## GET &nbsp;&nbsp;&nbsp;```/farms ```(#get-/farms-id)
 
 The returned data can be quite large, hence the need for setting a limit as a query parameter.
 
