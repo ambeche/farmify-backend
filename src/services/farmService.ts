@@ -63,7 +63,8 @@ const getFarms = async ({
   datetime,
 }: Request): Promise<Farm[]> => {
   const farms = await Farm.findAll({
-    attributes:  ['farmname', ['user_username', 'owner']],
+    ...options,
+    attributes: ['farmname', ['user_username', 'owner']],
     include: {
       attributes: { exclude: ['farm_farmname', 'farmFarmname'] },
       model: FarmData,
