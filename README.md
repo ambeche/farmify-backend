@@ -206,8 +206,6 @@ returns:
  ```json
 {
     "username": "martin",
-    "password": "testing-password"
-   
 }
 ```     
 
