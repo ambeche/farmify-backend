@@ -89,7 +89,7 @@ const getFarmData = async ({
       ...where,
       ...datetime,
     },
-    attributes: { exclude: ['farm_farmname'] },
+    attributes: { exclude: ['farm_farmname', 'farmFarmname'] },
   });
   console.log('query', where, options, datetime);
 
