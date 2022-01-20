@@ -2,7 +2,8 @@
 
 A smart farm application. All your farm data from different sensors and metrics are powered, organised and analysed for you. This backend provides REST APIs for the data and the statistical anlaysis, while the frontend allows the Farmer to monitor the data.
 
-# [Live Demo](https://farmify-api.herokuapp.com/farms)   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;      [ Link to the Frontend Repo](https://github.com/ambeche/farmify)
+## [Live Demo](https://farmify-api.herokuapp.com/farms)   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;      [ Link to the Frontend Repo](https://github.com/ambeche/farmify)
+<hr/>
 
 # [APIs and Usage](#examples)
 ### ```base url = https://farmify-api.herokuapp.com```
@@ -23,10 +24,11 @@ Data filtering is offered through query string parameters. The data from all end
 | :-------- | :---------    | :---------- | :----------       | 
 | month    |  `number [1,12`]   |  filter results by the month of the year. A month must be a value between 1 and 12, 1 = January, |   2    |  
 | year |    `number [YYYY]`  |   filter by year |    2020          | 
-| metrictype |   string [`rainfall`, `pH`, `temperature` ]  |   filter by the type of measurement taken |   ` ?metrictype=rainfall` |  
+| metrictype |   `string [rainfall, pH, temperature ]`  |   filter by the type of measurement taken |   ` ?metrictype=rainfall` |  
 | limit |    `number [>=0]`  |  limits the data returned from the server by the set limit , default is 25|   2 => only 2 items are returned |  
 | page |    `number [>0]`  |   used for pagination, check examples in the options section below |   `1,2,3,....1000`         |  
 | offset |    `number [>=0]`  |  skips a number of items specified by the offset and returns the request items after the skip |  |  
+| farmname |    `string ['farm name']`  |   filter by the name of the farm |    `Sari's Farm`         | 
 
 Examples for optoins are provided in the subsections below
 
@@ -348,4 +350,6 @@ a temporal fix is to **comment out the ```runDbMigration``` function in file ./s
 ### ```npm run test``` will run the tests
 Not all the desired tests where implemented due to time constrain.
 
---- `**done** ---
+The local server will run at address **```http://localhost:3001/farms```** assuming your set the **```PORT```** to **```3001```**
+
+--- **Viola!** ---
