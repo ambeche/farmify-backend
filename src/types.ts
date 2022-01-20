@@ -28,7 +28,7 @@ export type QueryParametersForValidation = {
   offset?: unknown;
   metrictype?: unknown;
   page?: unknown;
-  farmName?: unknown;
+  farmname?: unknown;
 };
 
 export type UserInputForValidation = {

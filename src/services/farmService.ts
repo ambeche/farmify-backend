@@ -51,7 +51,7 @@ const updateFarmWithData = async (
       farmExistsAndOwnedByUser?.farmname
     );
   FarmifyServerError.message =
-    "Action forbidden, only a farm's owner can add records to a farm !";
+    "Action forbidden, only a farm's owner can add records to a farm!";
   FarmifyServerError.name = 'FarmifyForbiddenError';
   throw FarmifyServerError;
 };

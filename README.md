@@ -2,7 +2,8 @@
 
 A smart farm application. All your farm data from different sensors and metrics are powered, organised and analysed for you. This backend provides REST APIs for the data and the statistical anlaysis, while the frontend allows the Farmer to monitor the data.
 
-# [Live Demo](https://farmify-api.herokuapp.com/farms)   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;      [ Link to the Frontend Repo](https://github.com/ambeche/farmify)
+## [Live Demo](https://farmify-api.herokuapp.com/farms)   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;      [ Link to the Frontend Repo](https://github.com/ambeche/farmify)
+<hr/>
 
 # [APIs and Usage](#examples)
 ### ```base url = https://farmify-api.herokuapp.com```
@@ -348,4 +349,6 @@ a temporal fix is to **comment out the ```runDbMigration``` function in file ./s
 ### ```npm run test``` will run the tests
 Not all the desired tests where implemented due to time constrain.
 
---- `**done** ---
+The local server will run at address **```http://localhost:3001/farms```** assuming your set the **```PORT```** to **```3001```**
+
+--- **Viola!** ---
