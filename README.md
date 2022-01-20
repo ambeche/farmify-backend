@@ -24,10 +24,11 @@ Data filtering is offered through query string parameters. The data from all end
 | :-------- | :---------    | :---------- | :----------       | 
 | month    |  `number [1,12`]   |  filter results by the month of the year. A month must be a value between 1 and 12, 1 = January, |   2    |  
 | year |    `number [YYYY]`  |   filter by year |    2020          | 
-| metrictype |   string [`rainfall`, `pH`, `temperature` ]  |   filter by the type of measurement taken |   ` ?metrictype=rainfall` |  
+| metrictype |   `string [rainfall, pH, temperature ]`  |   filter by the type of measurement taken |   ` ?metrictype=rainfall` |  
 | limit |    `number [>=0]`  |  limits the data returned from the server by the set limit , default is 25|   2 => only 2 items are returned |  
 | page |    `number [>0]`  |   used for pagination, check examples in the options section below |   `1,2,3,....1000`         |  
 | offset |    `number [>=0]`  |  skips a number of items specified by the offset and returns the request items after the skip |  |  
+| farmname |    `string ['farm name']`  |   filter by the name of the farm |    `Sari's Farm`         | 
 
 Examples for optoins are provided in the subsections below
 
