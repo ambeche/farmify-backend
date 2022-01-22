@@ -99,7 +99,7 @@ const parseAndValidateQueryParameters = ({
     offset: parseQueryParamNumber(off),
     metrictype: parseMetricType(met),
     page: page,
-    farmname: fname ? parseString(fname) : '',
+    farmname: !fname ? '' : parseString(fname),
   };
 };
 
