@@ -19,6 +19,7 @@ export interface QueryParameters {
   page?: number;
   metrictype?: MetricType;
   farmname?: string;
+  user_username?: string;
 }
 
 export type QueryParametersForValidation = {
@@ -29,6 +30,7 @@ export type QueryParametersForValidation = {
   metrictype?: unknown;
   page?: unknown;
   farmname?: unknown;
+  user_username?: unknown;
 };
 
 export type UserInputForValidation = {

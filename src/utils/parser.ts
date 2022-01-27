@@ -88,6 +88,7 @@ const parseAndValidateQueryParameters = ({
   metrictype: met,
   page: pg,
   farmname: fname,
+  user_username: uname,
 }: QueryParametersForValidation): QueryParameters => {
   const validatedPageNumber = parseQueryParamNumber(pg);
   const page =
@@ -100,6 +101,7 @@ const parseAndValidateQueryParameters = ({
     metrictype: parseMetricType(met),
     page: page,
     farmname: !fname ? '' : parseString(fname),
+    user_username: !uname ? '' : parseString(uname),
   };
 };
 

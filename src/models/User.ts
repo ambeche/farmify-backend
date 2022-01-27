@@ -1,16 +1,19 @@
 import { Model, DataTypes } from 'sequelize';
+import { FarmRecord } from '../types';
 import { sequelize } from '../utils/db';
 
 interface UserAttributes {
   username: string;
   password: string;
   createdAt?: string;
+  farms?: Pick<FarmRecord, 'farmname'>[];
 }
 export type UserInput = UserAttributes;
 class User extends Model<UserAttributes> implements UserAttributes {
   declare username: string;
   declare password: string;
   declare createdAt: string;
+  declare farms?: Pick<FarmRecord, 'farmname'>[];
 }
 
 User.init(

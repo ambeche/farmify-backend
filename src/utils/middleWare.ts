@@ -40,6 +40,8 @@ const farmDataFilter = (req: Request, _res: Response, next: NextFunction) => {
     if (validatedQueries.metrictype)
       where.metrictype = validatedQueries.metrictype;
     if (validatedQueries.farmname) where.farmname = validatedQueries.farmname;
+    if (validatedQueries.user_username)
+      where.user_username = validatedQueries.user_username;
 
     if (validatedQueries.year)
       datetime = {
