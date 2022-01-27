@@ -1,5 +1,5 @@
 import { UserInput } from './../models/User';
-import { User } from '../models/Farm';
+import Farm, { User } from '../models/Farm';
 import bcrypt from 'bcrypt';
 
 const addUser = async ({ username, password: pass }: UserInput) => {
@@ -13,6 +13,15 @@ const addUser = async ({ username, password: pass }: UserInput) => {
   return { username: newUser.username, createdAt: newUser.createdAt };
 };
 
-const getUser = async (username: string) => await User.findByPk(username);
+const getUser = async (username: string) =>
+  await User.findByPk(username, {
+    include: {
+      model: Farm,
+      attributes: ['farmname'],
+      where: {
+        user_username: username,
+      },
+    },
+  });
 
 export default { addUser, getUser };

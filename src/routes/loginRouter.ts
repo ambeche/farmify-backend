@@ -17,7 +17,7 @@ loginRouter.post('/', async (req, res, next) => {
 
     if (validatedInput?.username) {
       const user = await userService.getUser(validatedInput.username);
-
+      console.log('user', JSON.stringify(user, null, 2));
       if (user) {
         const verifiedPass = await bcrypt.compare(
           validatedInput.password,
@@ -28,7 +28,11 @@ loginRouter.post('/', async (req, res, next) => {
             { username: user.username, password: user.password },
             parseAndValidate.parseString(TOKEN_SECRET)
           );
-          return res.json({ token, username: user.username });
+          return res.json({
+            token,
+            username: user.username,
+            farms: user.farms,
+          });
         }
       }
     }
