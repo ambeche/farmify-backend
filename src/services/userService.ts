@@ -15,6 +15,7 @@ const addUser = async ({ username, password: pass }: UserInput) => {
 
 const getUser = async (username: string) =>
   await User.findByPk(username, {
+    attributes:['username'],
     include: {
       model: Farm,
       attributes: ['farmname'],

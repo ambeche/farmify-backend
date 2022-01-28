@@ -31,7 +31,6 @@ loginRouter.post('/', async (req, res, next) => {
           return res.json({
             token,
             username: user.username,
-            farms: user.farms,
           });
         }
       }
