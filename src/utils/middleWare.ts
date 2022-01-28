@@ -40,9 +40,6 @@ const farmDataFilter = (req: Request, _res: Response, next: NextFunction) => {
     if (validatedQueries.metrictype)
       where.metrictype = validatedQueries.metrictype;
     if (validatedQueries.farmname) where.farmname = validatedQueries.farmname;
-    if (validatedQueries.user_username)
-      where.user_username = validatedQueries.user_username;
-
     if (validatedQueries.year)
       datetime = {
         ...datetime,
@@ -84,7 +81,7 @@ const validationErrorHandler: ErrorRequestHandler = (
       res
         .status(400)
         .json({ error: ` ${error.message}, field must be unique!` });
-      console.log('sq error', error);
+      console.log('sq error', error.message);
 
       return;
     }
