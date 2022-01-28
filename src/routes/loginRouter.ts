@@ -1,10 +1,10 @@
 import { UserInputForValidation } from './../types';
 import express from 'express';
 import parseAndValidate from '../utils/parser';
-import userService from '../services/userService';
 import bcrypt from 'bcrypt';
 import * as jwt from 'jsonwebtoken';
 import { TOKEN_SECRET } from '../utils/config';
+import { User } from '../models/Farm';
 
 const loginRouter = express.Router();
 
@@ -16,7 +16,7 @@ loginRouter.post('/', async (req, res, next) => {
     );
 
     if (validatedInput?.username) {
-      const user = await userService.getUser(validatedInput.username);
+      const user = await User.findByPk(validatedInput.username);
       console.log('user', JSON.stringify(user, null, 2));
       if (user) {
         const verifiedPass = await bcrypt.compare(

@@ -2,6 +2,7 @@ import { UserInputForValidation } from './../types';
 import express from 'express';
 import userService from '../services/userService';
 import parseAndValidate from '../utils/parser';
+import middleWare from '../utils/middleWare';
 
 const userRouter = express.Router();
 
@@ -18,6 +19,18 @@ userRouter.post('/', async (req, res, next) => {
     res.json(addedUser);
   } catch (error) {
     return next(error);
+  }
+});
+
+userRouter.get('/', middleWare.bearerTokenExtractor, async (req, res, next) => {
+  try {
+    const authenticatedUser = parseAndValidate.parseString(
+      req.decodedToken.username
+    );
+    const user = await userService.getUser(authenticatedUser);
+    res.json(user);
+  } catch (error) {
+    next(error);
   }
 });
 
