@@ -80,7 +80,7 @@ const validationErrorHandler: ErrorRequestHandler = (
     ) {
       res
         .status(400)
-        .json({ error: ` ${error.message}, field must be unique!` });
+        .json({ error: ` ${error.message}, field must be unique! The set field already exists!` });
       console.log('sq error', error.message);
 
       return;
